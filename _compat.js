@@ -1,6 +1,7 @@
 // COMPAT HELPERS //////////////////////////////////////////////////////
 if(typeof window.iitc.compat !== 'function') window.iitc.compat = {};
 
+window.iitc.compat.warnings = {};
 window.iitc.compat.makeAlias = function(alias, original) {
   if (typeof alias !== 'string') {
     throw new Error('Alias must be a string');
@@ -42,12 +43,29 @@ window.iitc.compat.makeAlias = function(alias, original) {
       throw new Error('Cannot set value for ' + name + ': ' + e);
     }
   };
+  var _warnIfUnwarned = function(action, alias, original) {
+    if (!iitc.compat.ENABLE_WARNINGS) return;
+    var e = new Error('legacy');
+    var loc = e.stack.split('\n')[3].replace(/^\s*at\s*/i, '');
+    var key = action + ':' + alias + ':' + loc;
+    if (key in iitc.compat.warnings) {
+      return;
+    }
+    console.warn('PLUGIN DEVELOPERS: Please replace ' + action + ' ' + alias + ' with ' + original + ' at ' + loc);
+    iitc.compat.warnings[key] = true;
+  };
 
   Object.defineProperty(window, alias, {
     configurable: false,
     enumerable: true,
-    get: function(){ return _get(original); },
-    set: function(v){ _set(original, v); },
+    get: function(){
+      _warnIfUnwarned('use of', alias, original);
+      return _get(original);
+    },
+    set: function(v){
+      _warnIfUnwarned('assignment to', alias, original);
+      _set(original, v);
+    },
   });
 };
 
