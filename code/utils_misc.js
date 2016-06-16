@@ -262,7 +262,7 @@ window.zoomToAndShowPortal = function(guid, latlng) {
   map.setView(latlng, 17);
   // if the data is available, render it immediately. Otherwise defer
   // until it becomes available.
-  if(window.portals[guid])
+  if(iitc.portals[guid])
     renderPortalDetails(guid);
   else
     urlPortal = guid;
@@ -276,8 +276,8 @@ window.selectPortalByLatLng = function(lat, lng) {
     lng = lat.lng;
     lat = lat.lat;
   }
-  for(var guid in window.portals) {
-    var latlng = window.portals[guid].getLatLng();
+  for(var guid in iitc.portals) {
+    var latlng = iitc.portals[guid].getLatLng();
     if(latlng.lat == lat && latlng.lng == lng) {
       renderPortalDetails(guid);
       return;

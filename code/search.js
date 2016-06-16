@@ -223,7 +223,7 @@ addHook('search', function(query) {
   var term = query.term.toLowerCase();
   var teams = ['NEU','RES','ENL'];
 
-  $.each(portals, function(guid, portal) {
+  $.each(iitc.portals, function(guid, portal) {
     var data = portal.options.data;
     if(!data.title) return;
 
@@ -238,7 +238,7 @@ addHook('search', function(query) {
         onSelected: function(result, event) {
           if(event.type == 'dblclick') {
             zoomToAndShowPortal(guid, portal.getLatLng());
-          } else if(window.portals[guid]) {
+          } else if(iitc.portals[guid]) {
             if(!map.getBounds().contains(result.position)) map.setView(result.position);
             renderPortalDetails(guid);
           } else {

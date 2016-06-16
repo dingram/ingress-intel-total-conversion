@@ -7,7 +7,7 @@ window.getPortalLinks = function(guid) {
 
   var links = { in: [], out: [] };
 
-  $.each(window.links, function(g,l) {
+  $.each(iitc.links, function(g,l) {
     var d = l.options.data;
 
     if (d.oGuid == guid) {
@@ -31,7 +31,7 @@ window.getPortalLinksCount = function(guid) {
 window.getPortalFields = function(guid) {
   var fields = [];
 
-  $.each(window.fields, function(g,f) {
+  $.each(iitc.fields, function(g,f) {
     var d = f.options.data;
 
     if ( d.points[0].guid == guid
@@ -54,8 +54,8 @@ window.getPortalFieldsCount = function(guid) {
 // find the lat/lon for a portal, using any and all available data
 // (we have the list of portals, the cached portal details, plus links and fields as sources of portal locations)
 window.findPortalLatLng = function(guid) {
-  if (window.portals[guid]) {
-    return window.portals[guid].getLatLng();
+  if (iitc.portals[guid]) {
+    return iitc.portals[guid].getLatLng();
   }
 
   // not found in portals - try the cached (and possibly stale) details - good enough for location
@@ -65,8 +65,8 @@ window.findPortalLatLng = function(guid) {
   }
 
   // now try searching through fields
-  for (var fguid in window.fields) {
-    var f = window.fields[fguid].options.data;
+  for (var fguid in iitc.fields) {
+    var f = iitc.fields[fguid].options.data;
 
     for (var i in f.points) {
       if (f.points[i].guid == guid) {
@@ -76,8 +76,8 @@ window.findPortalLatLng = function(guid) {
   }
 
   // and finally search through links
-  for (var lguid in window.links) {
-    var l = window.links[lguid].options.data;
+  for (var lguid in iitc.links) {
+    var l = iitc.links[lguid].options.data;
     if (l.oGuid == guid) {
       return L.latLng (l.oLatE6/1E6, l.oLngE6/1E6);
     }
@@ -102,14 +102,14 @@ window.findPortalLatLng = function(guid) {
     if(item) return item[0];
 
     // now try searching through currently rendered portals
-    for(var guid in window.portals) {
-      var data = window.portals[guid].options.data;
+    for(var guid in iitc.portals) {
+      var data = iitc.portals[guid].options.data;
       if(data.latE6 == latE6 && data.lngE6 == lngE6) return guid;
     }
 
     // now try searching through fields
-    for(var fguid in window.fields) {
-      var points = window.fields[fguid].options.data.points;
+    for(var fguid in iitc.fields) {
+      var points = iitc.fields[fguid].options.data.points;
 
       for(var i in points) {
         var point = points[i];
@@ -118,8 +118,8 @@ window.findPortalLatLng = function(guid) {
     }
 
     // and finally search through links
-    for(var lguid in window.links) {
-      var l = window.links[lguid].options.data;
+    for(var lguid in iitc.links) {
+      var l = iitc.links[lguid].options.data;
       if(l.oLatE6 == latE6 && l.oLngE6 == lngE6) return l.oGuid;
       if(l.dLatE6 == latE6 && l.dLngE6 == lngE6) return l.dGuid;
     }
@@ -147,7 +147,7 @@ window.findPortalLatLng = function(guid) {
 // not entirely accurate - but available for all portals on the screen
 window.getPortalApGain = function(guid) {
 
-  var p = window.portals[guid];
+  var p = iitc.portals[guid];
   if (p) {
     var data = p.options.data;
 

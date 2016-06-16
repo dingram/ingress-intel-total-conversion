@@ -67,9 +67,9 @@ window.runOnSmartphonesBeforeBoot = function() {
 
 window.smartphoneInfo = function(data) {
   var guid = data.selectedPortalGuid;
-  if(!window.portals[guid]) return;
+  if(!iitc.portals[guid]) return;
 
-  var data = window.portals[selectedPortal].options.data;
+  var data = iitc.portals[selectedPortal].options.data;
   var details = window.portalDetail.get(guid);
 
   var lvl = data.level;
@@ -190,8 +190,8 @@ window.setAndroidPermalink = function() {
 
   var href = '/intel?ll='+lat+','+lng+'&z=' + map.getZoom();
 
-  if(window.selectedPortal && window.portals[window.selectedPortal]) {
-    var p = window.portals[window.selectedPortal].getLatLng();
+  if(window.selectedPortal && iitc.portals[window.selectedPortal]) {
+    var p = iitc.portals[window.selectedPortal].getLatLng();
     lat = Math.round(p.lat*1E6)/1E6;
     lng = Math.round(p.lng*1E6)/1E6;
     href += '&pll='+lat+','+lng;

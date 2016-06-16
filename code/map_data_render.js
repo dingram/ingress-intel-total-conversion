@@ -35,8 +35,8 @@ window.Render.prototype.startRenderPass = function(level,bounds) {
 
 window.Render.prototype.clearPortalsOutsideBounds = function(bounds) {
   var count = 0;
-  for (var guid in window.portals) {
-    var p = portals[guid];
+  for (var guid in iitc.portals) {
+    var p = iitc.portals[guid];
     // clear portals outside visible bounds - unless it's the selected portal, or it's relevant to artifacts
     if (!bounds.contains(p.getLatLng()) && guid !== selectedPortal && !artifact.isInterestingPortal(guid)) {
       this.deletePortalEntity(guid);
@@ -48,8 +48,8 @@ window.Render.prototype.clearPortalsOutsideBounds = function(bounds) {
 
 window.Render.prototype.clearLinksOutsideBounds = function(bounds) {
   var count = 0;
-  for (var guid in window.links) {
-    var l = links[guid];
+  for (var guid in iitc.links) {
+    var l = iitc.links[guid];
 
     // NOTE: our geodesic lines can have lots of intermediate points. the bounds calculation hasn't been optimised for this
     // so can be particularly slow. a simple bounds check based on start+end point will be good enough for this check
@@ -66,8 +66,8 @@ window.Render.prototype.clearLinksOutsideBounds = function(bounds) {
 
 window.Render.prototype.clearFieldsOutsideBounds = function(bounds) {
   var count = 0;
-  for (var guid in window.fields) {
-    var f = fields[guid];
+  for (var guid in iitc.fields) {
+    var f = iitc.fields[guid];
 
     // NOTE: our geodesic polys can have lots of intermediate points. the bounds calculation hasn't been optimised for this
     // so can be particularly slow. a simple bounds check based on corner points will be good enough for this check
@@ -146,7 +146,7 @@ window.Render.prototype.endRenderPass = function() {
   var countp=0,countl=0,countf=0;
 
   // check to see if there are any entities we haven't seen. if so, delete them
-  for (var guid in window.portals) {
+  for (var guid in iitc.portals) {
     // special case for selected portal - it's kept even if not seen
     // artifact (e.g. jarvis shard) portals are also kept - but they're always 'seen'
     if (!(guid in this.seenPortalsGuid) && guid !== selectedPortal) {
@@ -154,13 +154,13 @@ window.Render.prototype.endRenderPass = function() {
       countp++;
     }
   }
-  for (var guid in window.links) {
+  for (var guid in iitc.links) {
     if (!(guid in this.seenLinksGuid)) {
       this.deleteLinkEntity(guid);
       countl++;
     }
   }
-  for (var guid in window.fields) {
+  for (var guid in iitc.fields) {
     if (!(guid in this.seenFieldsGuid)) {
       this.deleteFieldEntity(guid);
       countf++;
@@ -205,8 +205,8 @@ window.Render.prototype.bringPortalsToFront = function() {
 
   // artifact portals are always brought to the front, above all others
   $.each(artifact.getInterestingPortals(), function(i,guid) {
-    if (portals[guid] && portals[guid]._map) {
-      portals[guid].bringToFront();
+    if (iitc.portals[guid] && iitc.portals[guid]._map) {
+      iitc.portals[guid].bringToFront();
     }
   });
 
@@ -220,32 +220,32 @@ window.Render.prototype.deleteEntity = function(guid) {
 }
 
 window.Render.prototype.deletePortalEntity = function(guid) {
-  if (guid in window.portals) {
-    var p = window.portals[guid];
+  if (guid in iitc.portals) {
+    var p = iitc.portals[guid];
     window.ornaments.removePortal(p);
     this.removePortalFromMapLayer(p);
-    delete window.portals[guid];
+    delete iitc.portals[guid];
     window.runHooks('portalRemoved', {portal: p, data: p.options.data });
   }
 }
 
 window.Render.prototype.deleteLinkEntity = function(guid) {
-  if (guid in window.links) {
-    var l = window.links[guid];
+  if (guid in iitc.links) {
+    var l = iitc.links[guid];
     linksFactionLayers[l.options.team].removeLayer(l);
-    delete window.links[guid];
+    delete iitc.links[guid];
     window.runHooks('linkRemoved', {link: l, data: l.options.data });
   }
 }
 
 
 window.Render.prototype.deleteFieldEntity = function(guid) {
-  if (guid in window.fields) {
-    var f = window.fields[guid];
+  if (guid in iitc.fields) {
+    var f = iitc.fields[guid];
     var fd = f.options.details;
 
     fieldsFactionLayers[f.options.team].removeLayer(f);
-    delete window.fields[guid];
+    delete iitc.fields[guid];
     window.runHooks('fieldRemoved', {field: f, data: f.options.data });
   }
 }
@@ -273,8 +273,8 @@ window.Render.prototype.createPlaceholderPortalEntity = function(guid,latE6,lngE
   // placeholder portals don't have a useful timestamp value - so the standard code that checks for updated
   // portal details doesn't apply
   // so, check that the basic details are valid and delete the existing portal if out of date
-  if (guid in window.portals) {
-    var p = window.portals[guid];
+  if (guid in iitc.portals) {
+    var p = iitc.portals[guid];
     if (team != p.options.data.team || latE6 != p.options.data.latE6 || lngE6 != p.options.data.lngE6) {
       // team or location have changed - delete existing portal
       this.deletePortalEntity(guid);
@@ -292,9 +292,9 @@ window.Render.prototype.createPortalEntity = function(ent) {
   var previousData = undefined;
 
   // check if entity already exists
-  if (ent[0] in window.portals) {
+  if (ent[0] in iitc.portals) {
     // yes. now check to see if the entity data we have is newer than that in place
-    var p = window.portals[ent[0]];
+    var p = iitc.portals[ent[0]];
 
     if (p.options.timestamp >= ent[1]) return; // this data is identical or older - abort processing
 
@@ -337,7 +337,7 @@ window.Render.prototype.createPortalEntity = function(ent) {
 
   window.runHooks('portalAdded', {portal: marker, previousData: previousData});
 
-  window.portals[ent[0]] = marker;
+  iitc.portals[ent[0]] = marker;
 
   // check for URL links to portal, and select it if this is the one
   if (urlPortalLL && urlPortalLL[0] == marker.getLatLng().lat && urlPortalLL[1] == marker.getLatLng().lng) {
@@ -384,10 +384,10 @@ window.Render.prototype.createFieldEntity = function(ent) {
   }
 
   // check if entity already exists
-  if(ent[0] in window.fields) {
+  if(ent[0] in iitc.fields) {
     // yes. in theory, we should never get updated data for an existing field. they're created, and they're destroyed - never changed
     // but theory and practice may not be the same thing...
-    var f = window.fields[ent[0]];
+    var f = iitc.fields[ent[0]];
 
     if (f.options.timestamp >= ent[1]) return; // this data is identical (or order) than that rendered - abort processing
 
@@ -419,7 +419,7 @@ window.Render.prototype.createFieldEntity = function(ent) {
 
   runHooks('fieldAdded',{field: poly});
 
-  window.fields[ent[0]] = poly;
+  iitc.fields[ent[0]] = poly;
 
   // TODO? postpone adding to the layer??
   fieldsFactionLayers[poly.options.team].addLayer(poly);
@@ -452,9 +452,9 @@ window.Render.prototype.createLinkEntity = function(ent,faked) {
 
 
   // check if entity already exists
-  if (ent[0] in window.links) {
+  if (ent[0] in iitc.links) {
     // yes. now, as sometimes links are 'faked', they have incomplete data. if the data we have is better, replace the data
-    var l = window.links[ent[0]];
+    var l = iitc.links[ent[0]];
 
     // the faked data will have older timestamps than real data (currently, faked set to zero)
     if (l.options.timestamp >= ent[1]) return; // this data is older or identical to the rendered data - abort processing
@@ -485,7 +485,7 @@ window.Render.prototype.createLinkEntity = function(ent,faked) {
 
   runHooks('linkAdded', {link: poly});
 
-  window.links[ent[0]] = poly;
+  iitc.links[ent[0]] = poly;
 
   linksFactionLayers[poly.options.team].addLayer(poly);
 }

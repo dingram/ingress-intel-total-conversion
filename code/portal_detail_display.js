@@ -3,16 +3,16 @@
 // methods that highlight the portal in the map view.
 
 window.renderPortalDetails = function(guid) {
-  selectPortal(window.portals[guid] ? guid : null);
+  selectPortal(iitc.portals[guid] ? guid : null);
 
   if (guid && !portalDetail.isFresh(guid)) {
     portalDetail.request(guid);
   }
 
   // TODO? handle the case where we request data for a particular portal GUID, but it *isn't* in
-  // window.portals....
+  // iitc.portals....
 
-  if(!window.portals[guid]) {
+  if(!iitc.portals[guid]) {
     urlPortal = guid;
     $('#portaldetails').html('');
     if(isSmartphone()) {
@@ -22,7 +22,7 @@ window.renderPortalDetails = function(guid) {
     return;
   }
 
-  var portal = window.portals[guid];
+  var portal = iitc.portals[guid];
   var data = portal.options.data;
   var details = portalDetail.get(guid);
 
@@ -254,8 +254,8 @@ window.selectPortal = function(guid) {
   var oldPortalGuid = selectedPortal;
   selectedPortal = guid;
 
-  var oldPortal = portals[oldPortalGuid];
-  var newPortal = portals[guid];
+  var oldPortal = iitc.portals[oldPortalGuid];
+  var newPortal = iitc.portals[guid];
 
   // Restore style of unselected portal
   if(!update && oldPortal) setMarkerStyle(oldPortal,false);

@@ -5,9 +5,9 @@
 window.debug = function() {}
 
 window.debug.renderDetails = function() {
-  console.log('portals: ' + Object.keys(window.portals).length);
-  console.log('links:   ' + Object.keys(window.links).length);
-  console.log('fields:  ' + Object.keys(window.fields).length);
+  console.log('portals: ' + Object.keys(iitc.portals).length);
+  console.log('links:   ' + Object.keys(iitc.links).length);
+  console.log('fields:  ' + Object.keys(iitc.fields).length);
 }
 
 window.debug.printStackTrace = function() {
