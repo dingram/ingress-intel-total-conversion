@@ -35,7 +35,7 @@ window.setMarkerStyle = function(marker, selected) {
   highlightPortal(marker);
 
   if (selected) {
-    marker.setStyle ({color: COLOR_SELECTED_PORTAL});
+    marker.setStyle ({color: iitc.colors.SELECTED_PORTAL});
   }
 }
 
@@ -54,7 +54,7 @@ window.getMarkerStyleOptions = function(details) {
 
   var dashArray = null;
   // thinner and dashed outline for placeholder portals
-  if (details.team != TEAM_NONE && level==0) {
+  if (details.team != iitc.constants.TEAM_NONE && level==0) {
     lvlWeight = 1;
     dashArray = [1,2];
   }
@@ -62,11 +62,11 @@ window.getMarkerStyleOptions = function(details) {
   var options = {
     radius: lvlRadius,
     stroke: true,
-    color: COLORS[details.team],
+    color: iitc.colors.TEAMS[details.team],
     weight: lvlWeight,
     opacity: 1,
     fill: true,
-    fillColor: COLORS[details.team],
+    fillColor: iitc.colors.TEAMS[details.team],
     fillOpacity: 0.5,
     dashArray: dashArray
   };

@@ -28,9 +28,9 @@ window.runOnSmartphonesBeforeBoot = function() {
   // don’t need many of those
   window.setupStyles = function() {
     $('head').append('<style>' +
-      [ '#largepreview.enl img { border:2px solid '+COLORS[TEAM_ENL]+'; } ',
-        '#largepreview.res img { border:2px solid '+COLORS[TEAM_RES]+'; } ',
-        '#largepreview.none img { border:2px solid '+COLORS[TEAM_NONE]+'; } '].join("\n")
+      [ '#largepreview.enl img { border:2px solid '+iitc.colors.TEAMS[iitc.constants.TEAM_ENL]+'; } ',
+        '#largepreview.res img { border:2px solid '+iitc.colors.TEAMS[iitc.constants.TEAM_RES]+'; } ',
+        '#largepreview.none img { border:2px solid '+iitc.colors.TEAMS[iitc.constants.TEAM_NONE]+'; } '].join("\n")
       + '</style>');
   }
 
@@ -76,7 +76,7 @@ window.smartphoneInfo = function(data) {
   if(data.team === "NEUTRAL")
     var t = '<span class="portallevel">L0</span>';
   else
-    var t = '<span class="portallevel" style="background: '+COLORS_LVL[lvl]+';">L' + lvl + '</span>';
+    var t = '<span class="portallevel" style="background: '+iitc.colors.LEVELS[lvl]+';">L' + lvl + '</span>';
 
   var percentage = data.health;
   if(details) {
@@ -102,13 +102,13 @@ window.smartphoneInfo = function(data) {
         var reso = ind < details.resonators.length ? details.resonators[ind] : null;
       }
 
-      var className = TEAM_TO_CSS[getTeam(details)];
-      if(slot !== null && OCTANTS[slot] === 'N')
+      var className = iitc.constants.TEAM_TO_CSS[getTeam(details)];
+      if(slot !== null && iitc.constants.OCTANTS[slot] === 'N')
         className += ' north'
       if(reso) {
         l = parseInt(reso.level);
         v = parseInt(reso.energy);
-        max = RESO_NRG[l];
+        max = iitc.constants.RESO_NRG[l];
         perc = v/max*100;
       } else {
         l = 0;
@@ -117,7 +117,7 @@ window.smartphoneInfo = function(data) {
         perc = 0;
       }
 
-      t += '<div class="resonator '+className+'" style="border-top-color: '+COLORS_LVL[l]+';left: '+(100*ind/8.0)+'%;">';
+      t += '<div class="resonator '+className+'" style="border-top-color: '+iitc.colors.LEVELS[l]+';left: '+(100*ind/8.0)+'%;">';
       t += '<div class="filllevel" style="width:'+perc+'%;"></div>';
       t += '</div>'
     }

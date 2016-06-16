@@ -61,13 +61,13 @@ window.startRefreshTimeout = function(override) {
     //ensure override can't cause too fast a refresh if repeatedly used (e.g. lots of scrolling/zooming)
     timeSinceLastRefresh = new Date().getTime()-window.requests._lastRefreshTime;
     if(timeSinceLastRefresh < 0) timeSinceLastRefresh = 0;  //in case of clock adjustments
-    if(timeSinceLastRefresh < MINIMUM_OVERRIDE_REFRESH*1000)
-      t = (MINIMUM_OVERRIDE_REFRESH*1000-timeSinceLastRefresh);
+    if(timeSinceLastRefresh < iitc.config.MINIMUM_OVERRIDE_REFRESH*1000)
+      t = (iitc.config.MINIMUM_OVERRIDE_REFRESH*1000-timeSinceLastRefresh);
   } else {
     window.requests._quickRefreshPending = false;
-    t = REFRESH*1000;
+    t = iitc.config.REFRESH*1000;
 
-    var adj = ZOOM_LEVEL_ADJ * (18 - map.getZoom());
+    var adj = iitc.config.ZOOM_LEVEL_ADJ * (18 - map.getZoom());
     if(adj > 0) t += adj*1000;
   }
   var next = new Date(new Date().getTime() + t).toLocaleTimeString();

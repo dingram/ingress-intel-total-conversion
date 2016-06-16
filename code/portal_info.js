@@ -20,7 +20,7 @@ window.getTotalPortalEnergy = function(d) {
   $.each(d.resonators, function(ind, reso) {
     if(!reso) return true;
     var level = parseInt(reso.level);
-    var max = RESO_NRG[level];
+    var max = iitc.constants.RESO_NRG[level];
     nrg += max;
   });
   return nrg;
@@ -92,7 +92,7 @@ window.getAttackApGain = function(d,fieldCount,linkCount) {
   if (!fieldCount) fieldCount = 0;
 
   var resoCount = 0;
-  var maxResonators = MAX_RESO_PER_PLAYER.slice(0);
+  var maxResonators = iitc.constants.MAX_RESO_PER_PLAYER.slice(0);
   var curResonators = [ 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
   for(var n = PLAYER.level + 1; n < 9; n++) {
@@ -113,14 +113,14 @@ window.getAttackApGain = function(d,fieldCount,linkCount) {
   });
 
 
-  var resoAp = resoCount * DESTROY_RESONATOR;
-  var linkAp = linkCount * DESTROY_LINK;
-  var fieldAp = fieldCount * DESTROY_FIELD;
+  var resoAp = resoCount * iitc.constants.DESTROY_RESONATOR;
+  var linkAp = linkCount * iitc.constants.DESTROY_LINK;
+  var fieldAp = fieldCount * iitc.constants.DESTROY_FIELD;
   var destroyAp = resoAp + linkAp + fieldAp;
-  var captureAp = CAPTURE_PORTAL + 8 * DEPLOY_RESONATOR + COMPLETION_BONUS;
+  var captureAp = iitc.constants.CAPTURE_PORTAL + 8 * iitc.constants.DEPLOY_RESONATOR + iitc.constants.COMPLETION_BONUS;
   var enemyAp = destroyAp + captureAp;
   var deployCount = 8 - resoCount;
-  var completionAp = (deployCount > 0) ? COMPLETION_BONUS : 0;
+  var completionAp = (deployCount > 0) ? iitc.constants.COMPLETION_BONUS : 0;
   var upgradeCount = 0;
   var upgradeAvailable = maxResonators[8];
   for(var n = 7; n >= 0; n--) {
@@ -130,7 +130,7 @@ window.getAttackApGain = function(d,fieldCount,linkCount) {
     }
     upgradeAvailable += maxResonators[n];
   }
-  var friendlyAp = deployCount * DEPLOY_RESONATOR + upgradeCount * UPGRADE_ANOTHERS_RESONATOR + completionAp;
+  var friendlyAp = deployCount * iitc.constants.DEPLOY_RESONATOR + upgradeCount * iitc.constants.UPGRADE_ANOTHERS_RESONATOR + completionAp;
   return {
     friendlyAp: friendlyAp,
     deployCount: deployCount,
@@ -152,8 +152,8 @@ window.potentialPortalLevel = function(d) {
     var resonator_levels = new Array();
     // figure out how many of each of these resonators can be placed by the player
     var player_resontators = new Array();
-    for(var i=1;i<=MAX_PORTAL_LEVEL; i++) {
-      player_resontators[i] = i > PLAYER.level ? 0 : MAX_RESO_PER_PLAYER[i];
+    for(var i=1;i<=iitc.constants.MAX_PORTAL_LEVEL; i++) {
+      player_resontators[i] = i > PLAYER.level ? 0 : iitc.constants.MAX_RESO_PER_PLAYER[i];
     }
     $.each(resonators_on_portal, function(ind, reso) {
       if(reso !== null && reso.owner === window.PLAYER.nickname) {
@@ -168,7 +168,7 @@ window.potentialPortalLevel = function(d) {
     
     // Max out portal
     var install_index = 0;
-    for(var i=MAX_PORTAL_LEVEL;i>=1; i--) {
+    for(var i=iitc.constants.MAX_PORTAL_LEVEL;i>=1; i--) {
       for(var install = player_resontators[i]; install>0; install--) {
         if(resonator_levels[install_index] < i) {
           resonator_levels[install_index] = i;
@@ -192,7 +192,7 @@ window.fixPortalImageUrl = function(url) {
     }
     return url;
   } else {
-    return DEFAULT_PORTAL_IMG;
+    return iitc.constants.DEFAULT_PORTAL_IMG;
   }
 
 }

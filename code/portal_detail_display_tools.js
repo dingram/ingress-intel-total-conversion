@@ -72,7 +72,7 @@ window.getModDetails = function(d) {
       }
 
       if (mod.rarity) {
-        modColor = COLORS_MOD[mod.rarity];
+        modColor = iitc.colors.MODS[mod.rarity];
       } else {
         modColor = '#fff';
       }
@@ -152,21 +152,21 @@ window.getResonatorDetails = function(d) {
 // slot: which slot this resonator occupies. Starts with 0 (east) and
 // rotates clockwise. So, last one is 7 (southeast).
 window.renderResonatorDetails = function(slot, level, nrg, nick) {
-  if(OCTANTS[slot] === 'N')
+  if(iitc.constants.OCTANTS[slot] === 'N')
     var className = 'meter north';
   else
     var className = 'meter';
 
-  var max = RESO_NRG[level];
+  var max = iitc.constants.RESO_NRG[level];
   var fillGrade = level > 0 ? nrg/max*100 : 0;
 
   var inf = (level > 0 ? 'energy:\t' + nrg   + ' / ' + max + ' (' + Math.round(fillGrade) + '%)\n'
                         +'level:\t'  + level + '\n'
                         +'owner:\t'  + nick  + '\n'
                        : '')
-          + (slot !== null ? 'octant:\t' + OCTANTS[slot] + ' ' + OCTANTS_ARROW[slot]:'');
+          + (slot !== null ? 'octant:\t' + iitc.constants.OCTANTS[slot] + ' ' + iitc.constants.OCTANTS_ARROW[slot]:'');
 
-  var style = fillGrade ? 'width:'+fillGrade+'%; background:'+COLORS_LVL[level]+';':'';
+  var style = fillGrade ? 'width:'+fillGrade+'%; background:'+iitc.colors.LEVELS[level]+';':'';
 
   var color = (level < 3 ? "#9900FF" : "#FFFFFF");
 

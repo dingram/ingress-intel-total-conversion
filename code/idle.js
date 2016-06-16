@@ -1,7 +1,7 @@
 // IDLE HANDLING /////////////////////////////////////////////////////
 
 window.idleTime = 0; // in seconds
-window._idleTimeLimit = MAX_IDLE_TIME;
+window._idleTimeLimit = iitc.config.MAX_IDLE_TIME;
 
 var IDLE_POLL_TIME = 10;
 
@@ -11,7 +11,7 @@ var idlePoll = function() {
 
   var hidden = (document.hidden || document.webkitHidden || document.mozHidden || document.msHidden || false);
   if (hidden) {
-    window._idleTimeLimit = window.REFRESH; // set a small time limit before entering idle mode
+    window._idleTimeLimit = iitc.config.REFRESH; // set a small time limit before entering idle mode
   }
   if (!wasIdle && isIdle()) {
     console.log('idlePoll: entering idle mode');
@@ -30,7 +30,7 @@ window.idleReset = function () {
     });
   }
   window.idleTime = 0;
-  window._idleTimeLimit = MAX_IDLE_TIME;
+  window._idleTimeLimit = iitc.config.MAX_IDLE_TIME;
 };
 
 window.idleSet = function() {

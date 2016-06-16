@@ -312,7 +312,7 @@ window.Render.prototype.createPortalEntity = function(ent) {
   var portalLevel = parseInt(ent[2][4])||0;
   var team = teamStringToId(ent[2][1]);
   // the data returns unclaimed portals as level 1 - but IITC wants them treated as level 0
-  if (team == TEAM_NONE) portalLevel = 0;
+  if (team == iitc.constants.TEAM_NONE) portalLevel = 0;
 
   var latlng = L.latLng(ent[2][2]/1E6, ent[2][3]/1E6);
 
@@ -405,7 +405,7 @@ window.Render.prototype.createFieldEntity = function(ent) {
   ];
 
   var poly = L.geodesicPolygon(latlngs, {
-    fillColor: COLORS[team],
+    fillColor: iitc.colors.TEAMS[team],
     fillOpacity: 0.25,
     stroke: false,
     clickable: false,
@@ -471,7 +471,7 @@ window.Render.prototype.createLinkEntity = function(ent,faked) {
     L.latLng(data.dLatE6/1E6, data.dLngE6/1E6)
   ];
   var poly = L.geodesicPolyline(latlngs, {
-    color: COLORS[team],
+    color: iitc.colors.TEAMS[team],
     opacity: 1,
     weight: faked ? 1 : 2,
     clickable: false,

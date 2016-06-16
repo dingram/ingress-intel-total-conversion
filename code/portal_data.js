@@ -165,16 +165,16 @@ window.getPortalApGain = function(guid) {
 // doesn't take account AP for resonator upgrades or AP for adding mods
 window.portalApGainMaths = function(resCount, linkCount, fieldCount) {
 
-  var deployAp = (8-resCount)*DEPLOY_RESONATOR;
-  if (resCount == 0) deployAp += CAPTURE_PORTAL;
-  if (resCount != 8) deployAp += COMPLETION_BONUS;
+  var deployAp = (8-resCount)*iitc.constants.DEPLOY_RESONATOR;
+  if (resCount == 0) deployAp += iitc.constants.CAPTURE_PORTAL;
+  if (resCount != 8) deployAp += iitc.constants.COMPLETION_BONUS;
   // there could also be AP for upgrading existing resonators, and for deploying mods - but we don't have data for that
   var friendlyAp = deployAp;
 
-  var destroyResoAp = resCount*DESTROY_RESONATOR;
-  var destroyLinkAp = linkCount*DESTROY_LINK;
-  var destroyFieldAp = fieldCount*DESTROY_FIELD;
-  var captureAp = CAPTURE_PORTAL + 8 * DEPLOY_RESONATOR + COMPLETION_BONUS;
+  var destroyResoAp = resCount*iitc.constants.DESTROY_RESONATOR;
+  var destroyLinkAp = linkCount*iitc.constants.DESTROY_LINK;
+  var destroyFieldAp = fieldCount*iitc.constants.DESTROY_FIELD;
+  var captureAp = iitc.constants.CAPTURE_PORTAL + 8 * iitc.constants.DEPLOY_RESONATOR + iitc.constants.COMPLETION_BONUS;
   var destroyAp = destroyResoAp+destroyLinkAp+destroyFieldAp;
   var enemyAp = destroyAp+captureAp;
 

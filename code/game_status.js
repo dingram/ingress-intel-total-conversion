@@ -29,5 +29,5 @@ window.updateGameScore = function(data) {
   }
 
   // TODO: idle handling - don't refresh when IITC is idle!
-  window.setTimeout('window.updateGameScore', REFRESH_GAME_SCORE*1000);
+  window.setTimeout('window.updateGameScore', iitc.config.REFRESH_GAME_SCORE*1000);
 }

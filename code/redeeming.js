@@ -104,7 +104,7 @@ window.formatPasscodeLong = function(data) {
         var l = item.level;
         if(0 < l) {
           l = parseInt(l);
-          html += '<span class="itemlevel" style="color:' + COLORS_LVL[l] + '">L' + l + '</span> ';
+          html += '<span class="itemlevel" style="color:' + iitc.colors.LEVELS[l] + '">L' + l + '</span> ';
         }
 
         html += window.escapeHtmlSpecialChars(type.name) + '</li>';
@@ -142,7 +142,7 @@ window.formatPasscodeShort = function(data) {
           var l = item.level;
           if(0 < l) {
             l = parseInt(l);
-            str += '<span class="itemlevel" style="color:' + COLORS_LVL[l] + '">' + shortName + l + '</span>';
+            str += '<span class="itemlevel" style="color:' + iitc.colors.LEVELS[l] + '">' + shortName + l + '</span>';
           } else {
             str += shortName;
           }
@@ -150,7 +150,7 @@ window.formatPasscodeShort = function(data) {
           var l = item.level;
           if(0 < l) {
             l = parseInt(l);
-            str += '<span class="itemlevel" style="color:' + COLORS_LVL[l] + '">L' + l + '</span> ';
+            str += '<span class="itemlevel" style="color:' + iitc.colors.LEVELS[l] + '">L' + l + '</span> ';
           }
           str += type.name;
         }

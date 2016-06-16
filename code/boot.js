@@ -95,17 +95,17 @@ window.layerChooserSetDisabledStates = function() {
 
 window.setupStyles = function() {
   $('head').append('<style>' +
-    [ '#largepreview.enl img { border:2px solid '+COLORS[TEAM_ENL]+'; } ',
-      '#largepreview.res img { border:2px solid '+COLORS[TEAM_RES]+'; } ',
-      '#largepreview.none img { border:2px solid '+COLORS[TEAM_NONE]+'; } ',
-      '#chatcontrols { bottom: '+(CHAT_SHRINKED+22)+'px; }',
-      '#chat { height: '+CHAT_SHRINKED+'px; } ',
-      '.leaflet-right { margin-right: '+(SIDEBAR_WIDTH+1)+'px } ',
-      '#updatestatus { width:'+(SIDEBAR_WIDTH+2)+'px;  } ',
-      '#sidebar { width:'+(SIDEBAR_WIDTH + HIDDEN_SCROLLBAR_ASSUMED_WIDTH + 1 /*border*/)+'px;  } ',
-      '#sidebartoggle { right:'+(SIDEBAR_WIDTH+1)+'px;  } ',
-      '#scrollwrapper  { width:'+(SIDEBAR_WIDTH + 2*HIDDEN_SCROLLBAR_ASSUMED_WIDTH)+'px; right:-'+(2*HIDDEN_SCROLLBAR_ASSUMED_WIDTH-2)+'px } ',
-      '#sidebar > * { width:'+(SIDEBAR_WIDTH+1)+'px;  }'].join("\n")
+    [ '#largepreview.enl img { border:2px solid '+iitc.colors.TEAMS[iitc.constants.TEAM_ENL]+'; } ',
+      '#largepreview.res img { border:2px solid '+iitc.colors.TEAMS[iitc.constants.TEAM_RES]+'; } ',
+      '#largepreview.none img { border:2px solid '+iitc.colors.TEAMS[iitc.constants.TEAM_NONE]+'; } ',
+      '#chatcontrols { bottom: '+(iitc.config.CHAT_SHRINKED+22)+'px; }',
+      '#chat { height: '+iitc.config.CHAT_SHRINKED+'px; } ',
+      '.leaflet-right { margin-right: '+(iitc.config.SIDEBAR_WIDTH+1)+'px } ',
+      '#updatestatus { width:'+(iitc.config.SIDEBAR_WIDTH+2)+'px;  } ',
+      '#sidebar { width:'+(iitc.config.SIDEBAR_WIDTH + iitc.config.HIDDEN_SCROLLBAR_ASSUMED_WIDTH + 1 /*border*/)+'px;  } ',
+      '#sidebartoggle { right:'+(iitc.config.SIDEBAR_WIDTH+1)+'px;  } ',
+      '#scrollwrapper  { width:'+(iitc.config.SIDEBAR_WIDTH + 2*iitc.config.HIDDEN_SCROLLBAR_ASSUMED_WIDTH)+'px; right:-'+(2*iitc.config.HIDDEN_SCROLLBAR_ASSUMED_WIDTH-2)+'px } ',
+      '#sidebar > * { width:'+(iitc.config.SIDEBAR_WIDTH+1)+'px;  }'].join("\n")
     + '</style>');
 }
 
@@ -165,7 +165,7 @@ window.setupMap = function() {
     center: [0,0],
     zoom: 1,
     zoomControl: (typeof android !== 'undefined' && android && android.showZoom) ? android.showZoom() : true,
-    minZoom: MIN_ZOOM,
+    minZoom: iitc.constants.MIN_ZOOM,
 //    zoomAnimation: false,
     markerZoomAnimation: false,
     bounceAtZoomLimits: false
@@ -248,28 +248,28 @@ window.setupMap = function() {
 
   // to avoid any favouritism, we'll put the player's own faction layer first
   if (PLAYER.team == 'RESISTANCE') {
-    addLayers['Resistance'] = factionLayers[TEAM_RES];
-    addLayers['Enlightened'] = factionLayers[TEAM_ENL];
+    addLayers['Resistance'] = factionLayers[iitc.constants.TEAM_RES];
+    addLayers['Enlightened'] = factionLayers[iitc.constants.TEAM_ENL];
   } else {
-    addLayers['Enlightened'] = factionLayers[TEAM_ENL];
-    addLayers['Resistance'] = factionLayers[TEAM_RES];
+    addLayers['Enlightened'] = factionLayers[iitc.constants.TEAM_ENL];
+    addLayers['Resistance'] = factionLayers[iitc.constants.TEAM_RES];
   }
-  if (!isLayerGroupDisplayed('Resistance', true)) hiddenLayer.push (factionLayers[TEAM_RES]);
-  if (!isLayerGroupDisplayed('Enlightened', true)) hiddenLayer.push (factionLayers[TEAM_ENL]);
+  if (!isLayerGroupDisplayed('Resistance', true)) hiddenLayer.push (factionLayers[iitc.constants.TEAM_RES]);
+  if (!isLayerGroupDisplayed('Enlightened', true)) hiddenLayer.push (factionLayers[iitc.constants.TEAM_ENL]);
 
-  setFactionLayersState (TEAM_NONE, true);
-  setFactionLayersState (TEAM_RES, isLayerGroupDisplayed('Resistance', true));
-  setFactionLayersState (TEAM_ENL, isLayerGroupDisplayed('Enlightened', true));
+  setFactionLayersState (iitc.constants.TEAM_NONE, true);
+  setFactionLayersState (iitc.constants.TEAM_RES, isLayerGroupDisplayed('Resistance', true));
+  setFactionLayersState (iitc.constants.TEAM_ENL, isLayerGroupDisplayed('Enlightened', true));
 
   // NOTE: these events are fired by the layer chooser, so won't happen until that's created and added to the map
   window.map.on('overlayadd overlayremove', function(e) {
     var displayed = (e.type == 'overlayadd');
     switch (e.name) {
       case 'Resistance':
-        setFactionLayersState (TEAM_RES, displayed);
+        setFactionLayersState (iitc.constants.TEAM_RES, displayed);
         break;
       case 'Enlightened':
-        setFactionLayersState (TEAM_ENL, displayed);
+        setFactionLayersState (iitc.constants.TEAM_ENL, displayed);
         break;
     }
   });
@@ -316,7 +316,7 @@ window.setupMap = function() {
   // map update status handling & update map hooks
   // ensures order of calls
   map.on('movestart', function() { window.mapRunsUserAction = true; window.requests.abort(); window.startRefreshTimeout(-1); });
-  map.on('moveend', function() { window.mapRunsUserAction = false; window.startRefreshTimeout(ON_MOVE_REFRESH*1000); });
+  map.on('moveend', function() { window.mapRunsUserAction = false; window.startRefreshTimeout(iitc.config.ON_MOVE_REFRESH*1000); });
 
   map.on('zoomend', function() { window.layerChooserSetDisabledStates(); });
   window.layerChooserSetDisabledStates();
@@ -337,7 +337,7 @@ window.setupMap = function() {
   // possibly some cases when resizing desktop browser too
   map.on('moveend', idleReset);
 
-  window.addResumeFunction(function() { window.startRefreshTimeout(ON_MOVE_REFRESH*1000); });
+  window.addResumeFunction(function() { window.startRefreshTimeout(iitc.config.ON_MOVE_REFRESH*1000); });
 
   // create the map data requester
   window.mapDataRequest = new MapDataRequest();
@@ -346,7 +346,7 @@ window.setupMap = function() {
   // start the refresh process with a small timeout, so the first data request happens quickly
   // (the code originally called the request function directly, and triggered a normal delay for the next refresh.
   //  however, the moveend/zoomend gets triggered on map load, causing a duplicate refresh. this helps prevent that
-  window.startRefreshTimeout(ON_MOVE_REFRESH*1000);
+  window.startRefreshTimeout(iitc.config.ON_MOVE_REFRESH*1000);
 };
 
 //adds a base layer to the map. done separately from the above, so that plugins that add base layers can be the default
@@ -449,9 +449,9 @@ window.setupSidebarToggle = function() {
       toggle.css('right', '0');
     } else {
       sidebar.css('z-index', 1001).show();
-      $('.leaflet-right').css('margin-right', SIDEBAR_WIDTH+1+'px');
+      $('.leaflet-right').css('margin-right', iitc.config.SIDEBAR_WIDTH+1+'px');
       toggle.html('<span class="toggle close"></span>');
-      toggle.css('right', SIDEBAR_WIDTH+1+'px');
+      toggle.css('right', iitc.config.SIDEBAR_WIDTH+1+'px');
     }
     $('.ui-tooltip').remove();
   });

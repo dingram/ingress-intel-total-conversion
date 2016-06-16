@@ -112,7 +112,7 @@ window.artifact.processResult = function (portals) {
 
       if (!artifact.portalInfo[guid][type]) artifact.portalInfo[guid][type] = {};
 
-      artifact.portalInfo[guid][type].target = TEAM_NONE;  // as we no longer know the team...
+      artifact.portalInfo[guid][type].target = iitc.constants.TEAM_NONE;  // as we no longer know the team...
     }
 
     for(var type in data.artifactBrief.fragment) {
@@ -245,10 +245,10 @@ window.artifact.showArtifactList = function() {
         row += '<td class="info">';
 
         if (data[type].target !== undefined) {
-          if (data[type].target == TEAM_NONE) {
+          if (data[type].target == iitc.constants.TEAM_NONE) {
             row += '<span class="target">Target Portal</span> ';
           } else {
-            row += '<span class="target '+TEAM_TO_CSS[data[type].target]+'">'+(data[type].target==TEAM_RES?'Resistance':'Enlightened')+' target</span> ';
+            row += '<span class="target '+iitc.constants.TEAM_TO_CSS[data[type].target]+'">'+(data[type].target==iitc.constants.TEAM_RES?'Resistance':'Enlightened')+' target</span> ';
           }
         }
 
@@ -257,8 +257,8 @@ window.artifact.showArtifactList = function() {
             row += '<br>';
           }
           var fragmentName = 'shard';
-//          row += '<span class="fragments'+(data[type].target?' '+TEAM_TO_CSS[data[type].target]:'')+'">'+fragmentName+': #'+data[type].fragments.join(', #')+'</span> ';
-          row += '<span class="fragments'+(data[type].target?' '+TEAM_TO_CSS[data[type].target]:'')+'">'+fragmentName+': yes</span> ';
+//          row += '<span class="fragments'+(data[type].target?' '+iitc.constants.TEAM_TO_CSS[data[type].target]:'')+'">'+fragmentName+': #'+data[type].fragments.join(', #')+'</span> ';
+          row += '<span class="fragments'+(data[type].target?' '+iitc.constants.TEAM_TO_CSS[data[type].target]:'')+'">'+fragmentName+': yes</span> ';
         }
 
         row += '</td></tr>';

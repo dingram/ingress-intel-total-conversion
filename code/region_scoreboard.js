@@ -55,7 +55,7 @@ function regionScoreboardScoreHistoryChart(result, logscale) {
       otherSvg.push('<g title="test" class="checkpoint" data-cp="'+i+'" data-enl="'+items[i][0]+'" data-res="'+items[i][1]+'">');
       otherSvg.push('<rect x="'+(i*10+35)+'" y="10" width="10" height="100" fill="black" fill-opacity="0" />');
       for (var t=0; t<2; t++) {
-        var col = t==0 ? COLORS[TEAM_ENL] : COLORS[TEAM_RES];
+        var col = t==0 ? iitc.colors.TEAMS[iitc.constants.TEAM_ENL] : iitc.colors.TEAMS[iitc.constants.TEAM_RES];
         otherSvg.push('<circle cx="'+x+'" cy="'+scale(items[i][t])+'" r="3" stroke-width="1" stroke="'+col+'" fill="'+col+'" fill-opacity="0.5" />');
       }
       otherSvg.push('</g>');
@@ -105,7 +105,7 @@ function regionScoreboardScoreHistoryChart(result, logscale) {
   paths += '<path d="'+ticks.join(' ')+'" stroke="#fff" opacity="0.3" />;'
 
   for (var t=0; t<2; t++) {
-    var col = t==0 ? COLORS[TEAM_ENL] : COLORS[TEAM_RES];
+    var col = t==0 ? iitc.colors.TEAMS[iitc.constants.TEAM_ENL] : iitc.colors.TEAMS[iitc.constants.TEAM_RES];
     if (teamPaths[t].length > 0) {
       paths += '<path d="'+teamPaths[t].join(' ')+'" stroke="'+col+'" />';
     }
@@ -159,7 +159,7 @@ function regionScoreboardSuccess(data,dlg,logscale) {
   for (var t=0; t<2; t++) {
     var team = t==0 ? 'Enlightened' : 'Resistance';
     var teamClass = t==0 ? 'enl' : 'res';
-    var teamCol = t==0 ? COLORS[TEAM_ENL] : COLORS[TEAM_RES];
+    var teamCol = t==0 ? iitc.colors.TEAMS[iitc.constants.TEAM_ENL] : iitc.colors.TEAMS[iitc.constants.TEAM_RES];
     var barSize = Math.round(data.result.gameScore[t]/maxAverage*200);
     teamRow[t] = '<tr><th class="'+teamClass+'">'+team+'</th><td class="'+teamClass+'">'+digits(data.result.gameScore[t])+'</td><td><div style="background:'+teamCol+'; width: '+barSize+'px; height: 1.3ex; border: 2px outset '+teamCol+'"> </td></tr>';
 

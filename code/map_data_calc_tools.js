@@ -64,7 +64,7 @@ window.debugMapZoomParameters = function() {
   //for debug purposes, log the tile params used for each zoom level
   console.log('DEBUG: Map Zoom Parameters');
   var doneZooms = {};
-  for (var z=MIN_ZOOM; z<=21; z++) {
+  for (var z=iitc.constants.MIN_ZOOM; z<=21; z++) {
     var ourZoom = getDataZoomForMapZoom(z);
     console.log('DEBUG: map zoom '+z+': IITC requests '+ourZoom+(ourZoom!=z?' instead':''));
     if (!doneZooms[ourZoom]) {
@@ -134,7 +134,7 @@ window.getDataZoomForMapZoom = function(zoom) {
 
     var origTileParams = getMapZoomTileParameters(zoom);
 
-    while (zoom > MIN_ZOOM) {
+    while (zoom > iitc.constants.MIN_ZOOM) {
       var newTileParams = getMapZoomTileParameters(zoom-1);
 
       if ( newTileParams.tilesPerEdge != origTileParams.tilesPerEdge
@@ -184,12 +184,12 @@ window.pointToTileId = function(params, x, y) {
 
 window.getResonatorLatLng = function(dist, slot, portalLatLng) {
   // offset in meters
-  var dn = dist*SLOT_TO_LAT[slot];
-  var de = dist*SLOT_TO_LNG[slot];
+  var dn = dist*iitc.constants.SLOT_TO_LAT[slot];
+  var de = dist*iitc.constants.SLOT_TO_LNG[slot];
 
   // Coordinate offset in radians
-  var dLat = dn/EARTH_RADIUS;
-  var dLon = de/(EARTH_RADIUS*Math.cos(Math.PI/180*portalLatLng[0]));
+  var dLat = dn/iitc.constants.EARTH_RADIUS;
+  var dLon = de/(iitc.constants.EARTH_RADIUS*Math.cos(Math.PI/180*portalLatLng[0]));
 
   // OffsetPosition, decimal degrees
   var lat0 = portalLatLng[0] + dLat * 180/Math.PI;

@@ -50,7 +50,7 @@ window.renderPortalDetails = function(guid) {
 
 
   // portal level. start with basic data - then extend with fractional info in tooltip if available
-  var levelInt = (teamStringToId(data.team) == TEAM_NONE) ? 0 : data.level;
+  var levelInt = (teamStringToId(data.team) == iitc.constants.TEAM_NONE) ? 0 : data.level;
   var levelDetails = levelInt;
   if (details) {
     levelDetails = getPortalLevel(details);
@@ -92,7 +92,7 @@ window.renderPortalDetails = function(guid) {
 
   $('#portaldetails')
     .html('') //to ensure it's clear
-    .attr('class', TEAM_TO_CSS[teamStringToId(data.team)])
+    .attr('class', iitc.constants.TEAM_TO_CSS[teamStringToId(data.team)])
     .append(
       $('<h3>').attr({class:'title'}).text(title),
 
@@ -230,7 +230,7 @@ window.setPortalIndicators = function(p) {
       portalRangeIndicator = (range.range > 0
           ? L.geodesicCircle(coord, range.range, {
               fill: false,
-              color: RANGE_INDICATOR_COLOR,
+              color: iitc.colors.RANGE_INDICATOR,
               weight: 3,
               dashArray: range.isLinkable ? undefined : "10,10",
               clickable: false })
@@ -238,8 +238,8 @@ window.setPortalIndicators = function(p) {
         ).addTo(map);
     }
 
-    portalAccessIndicator = L.circle(coord, HACK_RANGE,
-      { fill: false, color: ACCESS_INDICATOR_COLOR, weight: 2, clickable: false }
+    portalAccessIndicator = L.circle(coord, iitc.constants.HACK_RANGE,
+      { fill: false, color: iitc.constants.ACCESS_INDICATOR, weight: 2, clickable: false }
     ).addTo(map);
   }
 

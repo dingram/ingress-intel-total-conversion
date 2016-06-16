@@ -229,7 +229,7 @@ addHook('search', function(query) {
 
     if(data.title.toLowerCase().indexOf(term) !== -1) {
       var team = portal.options.team;
-      var color = team==TEAM_NONE ? '#CCC' : COLORS[team];
+      var color = team==iitc.constants.TEAM_NONE ? '#CCC' : iitc.colors.TEAMS[team];
       query.addResult({
         title: data.title,
         description: teams[team] + ', L' + data.level + ', ' + data.health + '%, ' + data.resCount + ' Resonators',
@@ -269,7 +269,7 @@ addHook('search', function(query) {
 addHook('search', function(query) {
   if(!query.confirmed) return;
 
-  $.getJSON(NOMINATIM + encodeURIComponent(query.term), function(data) {
+  $.getJSON(iitc.constants.NOMINATIM + encodeURIComponent(query.term), function(data) {
     if(data.length == 0) {
       query.addResult({
         title: 'No results on OpenStreetMap',

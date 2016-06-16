@@ -307,7 +307,7 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
     var msgToPlayer = false;
 
     var time = json[1];
-    var team = json[2].plext.team === 'RESISTANCE' ? TEAM_RES : TEAM_ENL;
+    var team = json[2].plext.team === 'RESISTANCE' ? iitc.constants.TEAM_RES : iitc.constants.TEAM_ENL;
     var auto = json[2].plext.plextType !== 'PLAYER_GENERATED';
     var systemNarrowcast = json[2].plext.plextType === 'SYSTEM_NARROWCAST';
 
@@ -327,7 +327,7 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
 
       case 'PLAYER': // automatically generated messages
         nick = markup[1].plain;
-        team = markup[1].team === 'RESISTANCE' ? TEAM_RES : TEAM_ENL;
+        team = markup[1].team === 'RESISTANCE' ? iitc.constants.TEAM_RES : iitc.constants.TEAM_ENL;
         if(ind > 0) msg += nick; // don’t repeat nick directly
         break;
 
@@ -455,7 +455,7 @@ window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarro
   {
     msg = '<div class="system_narrowcast">' + msg + '</div>';
   }
-  var color = COLORS[team];
+  var color = iitc.colors.TEAMS[team];
   if (nick === window.PLAYER.nickname) color = '#fd6';    //highlight things said/done by the player in a unique colour (similar to @player mentions from others in the chat text itself)
   var s = 'style="cursor:pointer; color:'+color+'"';
   var i = ['<span class="invisep">&lt;</span>', '<span class="invisep">&gt;</span>'];
@@ -551,7 +551,7 @@ window.chat.needMoreMessages = function() {
   if(activeChat.length === 0) return;
 
   var hasScrollbar = scrollBottom(activeChat) !== 0 || activeChat.scrollTop() !== 0;
-  var nearTop = activeChat.scrollTop() <= CHAT_REQUEST_SCROLL_TOP;
+  var nearTop = activeChat.scrollTop() <= iitc.config.CHAT_REQUEST_SCROLL_TOP;
   if(hasScrollbar && !nearTop) return;
 
   console.log('No scrollbar or near top in active chat. Requesting more data.');
@@ -689,21 +689,21 @@ window.chat.setup = function() {
   $('#chatfaction').scroll(function() {
     var t = $(this);
     if(t.data('ignoreNextScroll')) return t.data('ignoreNextScroll', false);
-    if(t.scrollTop() < CHAT_REQUEST_SCROLL_TOP) chat.requestFaction(true);
+    if(t.scrollTop() < iitc.config.CHAT_REQUEST_SCROLL_TOP) chat.requestFaction(true);
     if(scrollBottom(t) === 0) chat.requestFaction(false);
   });
 
   $('#chatall').scroll(function() {
     var t = $(this);
     if(t.data('ignoreNextScroll')) return t.data('ignoreNextScroll', false);
-    if(t.scrollTop() < CHAT_REQUEST_SCROLL_TOP) chat.requestPublic(true);
+    if(t.scrollTop() < iitc.config.CHAT_REQUEST_SCROLL_TOP) chat.requestPublic(true);
     if(scrollBottom(t) === 0) chat.requestPublic(false);
   });
 
   $('#chatalerts').scroll(function() {
     var t = $(this);
     if(t.data('ignoreNextScroll')) return t.data('ignoreNextScroll', false);
-    if(t.scrollTop() < CHAT_REQUEST_SCROLL_TOP) chat.requestAlerts(true);
+    if(t.scrollTop() < iitc.config.CHAT_REQUEST_SCROLL_TOP) chat.requestAlerts(true);
     if(scrollBottom(t) === 0) chat.requestAlerts(false);
   });
 

@@ -12,11 +12,11 @@ window.getTeam = function(details) {
 }
 
 window.teamStringToId = function(teamStr) {
-  var team = TEAM_NONE;
-  if(teamStr === 'ENLIGHTENED') team = TEAM_ENL;
-  if(teamStr === 'RESISTANCE') team = TEAM_RES;
-  if(teamStr === 'E') team = TEAM_ENL;
-  if(teamStr === 'R') team = TEAM_RES;
+  var team = iitc.constants.TEAM_NONE;
+  if(teamStr === 'ENLIGHTENED') team = iitc.constants.TEAM_ENL;
+  if(teamStr === 'RESISTANCE') team = iitc.constants.TEAM_RES;
+  if(teamStr === 'E') team = iitc.constants.TEAM_ENL;
+  if(teamStr === 'R') team = iitc.constants.TEAM_RES;
   return team;
 }
 
