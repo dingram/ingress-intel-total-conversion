@@ -51,7 +51,7 @@ window.startRefreshTimeout = function(override) {
   // may be required to remove 'paused during interaction' message in
   // status bar
   window.renderUpdateStatus();
-  if(refreshTimeout) clearTimeout(refreshTimeout);
+  if(iitc.refreshTimeout) clearTimeout(iitc.refreshTimeout);
   if(override == -1) return;  //don't set a new timeout
 
   var t = 0;
@@ -72,7 +72,7 @@ window.startRefreshTimeout = function(override) {
   }
   var next = new Date(new Date().getTime() + t).toLocaleTimeString();
 //  console.log('planned refresh in ' + (t/1000) + ' seconds, at ' + next);
-  refreshTimeout = setTimeout(window.requests._callOnRefreshFunctions, t);
+  iitc.refreshTimeout = setTimeout(window.requests._callOnRefreshFunctions, t);
   renderUpdateStatus();
 }
 

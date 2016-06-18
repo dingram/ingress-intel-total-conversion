@@ -38,7 +38,7 @@ window.Render.prototype.clearPortalsOutsideBounds = function(bounds) {
   for (var guid in iitc.portals) {
     var p = iitc.portals[guid];
     // clear portals outside visible bounds - unless it's the selected portal, or it's relevant to artifacts
-    if (!bounds.contains(p.getLatLng()) && guid !== selectedPortal && !artifact.isInterestingPortal(guid)) {
+    if (!bounds.contains(p.getLatLng()) && guid !== iitc.selectedPortal && !artifact.isInterestingPortal(guid)) {
       this.deletePortalEntity(guid);
       count++;
     }
@@ -97,7 +97,7 @@ window.Render.prototype.processDeletedGameEntityGuids = function(deleted) {
     if ( !(guid in this.deletedGuid) ) {
       this.deletedGuid[guid] = true;  // flag this guid as having being processed
 
-      if (guid == selectedPortal) {
+      if (guid == iitc.selectedPortal) {
         // the rare case of the selected portal being deleted. clear the details tab and deselect it
         renderPortalDetails(null);
       }
@@ -149,7 +149,7 @@ window.Render.prototype.endRenderPass = function() {
   for (var guid in iitc.portals) {
     // special case for selected portal - it's kept even if not seen
     // artifact (e.g. jarvis shard) portals are also kept - but they're always 'seen'
-    if (!(guid in this.seenPortalsGuid) && guid !== selectedPortal) {
+    if (!(guid in this.seenPortalsGuid) && guid !== iitc.selectedPortal) {
       this.deletePortalEntity(guid);
       countp++;
     }
@@ -175,8 +175,8 @@ window.Render.prototype.endRenderPass = function() {
   this.isRendering = false;
 
   // re-select the selected portal, to re-render the side-bar. ensures that any data calculated from the map data is up to date
-  if (selectedPortal) {
-    renderPortalDetails (selectedPortal);
+  if (iitc.selectedPortal) {
+    renderPortalDetails (iitc.selectedPortal);
   }
 }
 
@@ -340,24 +340,24 @@ window.Render.prototype.createPortalEntity = function(ent) {
   iitc.portals[ent[0]] = marker;
 
   // check for URL links to portal, and select it if this is the one
-  if (urlPortalLL && urlPortalLL[0] == marker.getLatLng().lat && urlPortalLL[1] == marker.getLatLng().lng) {
+  if (iitc.urlPortalLL && iitc.urlPortalLL[0] == marker.getLatLng().lat && iitc.urlPortalLL[1] == marker.getLatLng().lng) {
     // URL-passed portal found via pll parameter - set the guid-based parameter
-    console.log('urlPortalLL '+urlPortalLL[0]+','+urlPortalLL[1]+' matches portal GUID '+ent[0]);
+    console.log('iitc.urlPortalLL '+iitc.urlPortalLL[0]+','+iitc.urlPortalLL[1]+' matches portal GUID '+ent[0]);
 
-    urlPortal = ent[0];
-    urlPortalLL = undefined;  // clear the URL parameter so it's not matched again
+    iitc.urlPortal = ent[0];
+    iitc.urlPortalLL = undefined;  // clear the URL parameter so it's not matched again
   }
-  if (urlPortal == ent[0]) {
+  if (iitc.urlPortal == ent[0]) {
     // URL-passed portal found via guid parameter - set it as the selected portal
-    console.log('urlPortal GUID '+urlPortal+' found - selecting...');
-    selectedPortal = ent[0];
-    urlPortal = undefined;  // clear the URL parameter so it's not matched again
+    console.log('iitc.urlPortal GUID '+iitc.urlPortal+' found - selecting...');
+    iitc.selectedPortal = ent[0];
+    iitc.urlPortal = undefined;  // clear the URL parameter so it's not matched again
   }
 
   // (re-)select the portal, to refresh the sidebar on any changes
-  if (ent[0] == selectedPortal) {
+  if (ent[0] == iitc.selectedPortal) {
     console.log('portal guid '+ent[0]+' is the selected portal - re-rendering portal details');
-    renderPortalDetails (selectedPortal);
+    renderPortalDetails (iitc.selectedPortal);
   }
 
   window.ornaments.addPortal(marker);

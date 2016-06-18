@@ -97,6 +97,6 @@ window.highlightPortal = function(p) {
 
 window.resetHighlightedPortals = function() {
   $.each(iitc.portals, function(guid, portal) {
-    setMarkerStyle(portal, guid === selectedPortal);
+    setMarkerStyle(portal, guid === iitc.selectedPortal);
   });
 }

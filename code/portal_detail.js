@@ -47,7 +47,7 @@ var handleResponse = function(guid, data, success) {
 
     //FIXME..? better way of handling sidebar refreshing...
 
-    if (guid == selectedPortal) {
+    if (guid == iitc.selectedPortal) {
       renderPortalDetails(guid);
     }
 

@@ -315,8 +315,8 @@ window.setupMap = function() {
 
   // map update status handling & update map hooks
   // ensures order of calls
-  map.on('movestart', function() { window.mapRunsUserAction = true; window.requests.abort(); window.startRefreshTimeout(-1); });
-  map.on('moveend', function() { window.mapRunsUserAction = false; window.startRefreshTimeout(iitc.config.ON_MOVE_REFRESH*1000); });
+  map.on('movestart', function() { iitc.mapRunsUserAction = true; window.requests.abort(); window.startRefreshTimeout(-1); });
+  map.on('moveend', function() { iitc.mapRunsUserAction = false; window.startRefreshTimeout(iitc.config.ON_MOVE_REFRESH*1000); });
 
   map.on('zoomend', function() { window.layerChooserSetDisabledStates(); });
   window.layerChooserSetDisabledStates();
@@ -634,12 +634,12 @@ function boot() {
   window.setupLayerChooserStatusRecorder();
   // read here ONCE, so the URL is only evaluated one time after the
   // necessary data has been loaded.
-  urlPortalLL = getURLParam('pll');
-  if(urlPortalLL) {
-    urlPortalLL = urlPortalLL.split(",");
-    urlPortalLL = [parseFloat(urlPortalLL[0]) || 0.0, parseFloat(urlPortalLL[1]) || 0.0];
+  iitc.urlPortalLL = getURLParam('pll');
+  if(iitc.urlPortalLL) {
+    iitc.urlPortalLL = iitc.urlPortalLL.split(",");
+    iitc.urlPortalLL = [parseFloat(iitc.urlPortalLL[0]) || 0.0, parseFloat(iitc.urlPortalLL[1]) || 0.0];
   }
-  urlPortal = getURLParam('pguid');
+  iitc.urlPortal = getURLParam('pguid');
 
   $('#sidebar').show();
 

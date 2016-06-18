@@ -192,8 +192,8 @@ window.formatInterval = function(seconds,maxTerms) {
 
 
 window.rangeLinkClick = function() {
-  if(window.portalRangeIndicator)
-    window.map.fitBounds(window.portalRangeIndicator.getBounds());
+  if(iitc.portalRangeIndicator)
+    window.map.fitBounds(iitc.portalRangeIndicator.getBounds());
   if(window.isSmartphone())
     window.show('map');
 }
@@ -265,7 +265,7 @@ window.zoomToAndShowPortal = function(guid, latlng) {
   if(iitc.portals[guid])
     renderPortalDetails(guid);
   else
-    urlPortal = guid;
+    iitc.urlPortal = guid;
 }
 
 window.selectPortalByLatLng = function(lat, lng) {
@@ -285,8 +285,8 @@ window.selectPortalByLatLng = function(lat, lng) {
   }
 
   // not currently visible
-  urlPortalLL = [lat, lng];
-  map.setView(urlPortalLL, 17);
+  iitc.urlPortalLL = [lat, lng];
+  map.setView(iitc.urlPortalLL, 17);
 };
 
 String.prototype.capitalize = function() {
@@ -384,17 +384,17 @@ window.calcTriArea = function(p) {
   return Math.abs((p[0].lat*(p[1].lng-p[2].lng)+p[1].lat*(p[2].lng-p[0].lng)+p[2].lat*(p[0].lng-p[1].lng))/2);
 }
 
-// Update layerGroups display status to window.overlayStatus and localStorage 'ingress.intelmap.layergroupdisplayed'
+// Update layerGroups display status to iitc.overlayStatus and localStorage 'ingress.intelmap.layergroupdisplayed'
 window.updateDisplayedLayerGroup = function(name, display) {
-  overlayStatus[name] = display;
-  localStorage['ingress.intelmap.layergroupdisplayed'] = JSON.stringify(overlayStatus);
+  iitc.overlayStatus[name] = display;
+  localStorage['ingress.intelmap.layergroupdisplayed'] = JSON.stringify(iitc.overlayStatus);
 }
 
-// Read layerGroup status from window.overlayStatus if it was added to map,
+// Read layerGroup status from iitc.overlayStatus if it was added to map,
 // read from cookie if it has not added to map yet.
-// return 'defaultDisplay' if both overlayStatus and cookie didn't have the record
+// return 'defaultDisplay' if both iitc.overlayStatus and cookie didn't have the record
 window.isLayerGroupDisplayed = function(name, defaultDisplay) {
-  if(typeof(overlayStatus[name]) !== 'undefined') return overlayStatus[name];
+  if(typeof(iitc.overlayStatus[name]) !== 'undefined') return iitc.overlayStatus[name];
 
   convertCookieToLocalStorage('ingress.intelmap.layergroupdisplayed');
   var layersJSON = localStorage['ingress.intelmap.layergroupdisplayed'];
@@ -402,9 +402,9 @@ window.isLayerGroupDisplayed = function(name, defaultDisplay) {
 
   var layers = JSON.parse(layersJSON);
   // keep latest overlayStatus
-  overlayStatus = $.extend(layers, overlayStatus);
-  if(typeof(overlayStatus[name]) === 'undefined') return defaultDisplay;
-  return overlayStatus[name];
+  iitc.overlayStatus = $.extend(layers, iitc.overlayStatus);
+  if(typeof(iitc.overlayStatus[name]) === 'undefined') return defaultDisplay;
+  return iitc.overlayStatus[name];
 }
 
 window.addLayerGroup = function(name, layerGroup, defaultDisplay) {

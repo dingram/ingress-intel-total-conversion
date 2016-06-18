@@ -13,7 +13,7 @@ window.renderPortalDetails = function(guid) {
   // iitc.portals....
 
   if(!iitc.portals[guid]) {
-    urlPortal = guid;
+    iitc.urlPortal = guid;
     $('#portaldetails').html('');
     if(isSmartphone()) {
       $('.fullimg').remove();
@@ -211,10 +211,10 @@ window.getPortalMiscDetails = function(guid,d) {
 // given details. Clear them if parameter 'd' is null.
 window.setPortalIndicators = function(p) {
 
-  if(portalRangeIndicator) map.removeLayer(portalRangeIndicator);
-  portalRangeIndicator = null;
-  if(portalAccessIndicator) map.removeLayer(portalAccessIndicator);
-  portalAccessIndicator = null;
+  if(iitc.portalRangeIndicator) map.removeLayer(iitc.portalRangeIndicator);
+  iitc.portalRangeIndicator = null;
+  if(iitc.portalAccessIndicator) map.removeLayer(iitc.portalAccessIndicator);
+  iitc.portalAccessIndicator = null;
 
   // if we have a portal...
 
@@ -227,7 +227,7 @@ window.setPortalIndicators = function(p) {
     var d = portalDetail.get(p.options.guid);
     if (d) {
       var range = getPortalRange(d);
-      portalRangeIndicator = (range.range > 0
+      iitc.portalRangeIndicator = (range.range > 0
           ? L.geodesicCircle(coord, range.range, {
               fill: false,
               color: iitc.colors.RANGE_INDICATOR,
@@ -238,7 +238,7 @@ window.setPortalIndicators = function(p) {
         ).addTo(map);
     }
 
-    portalAccessIndicator = L.circle(coord, iitc.constants.HACK_RANGE,
+    iitc.portalAccessIndicator = L.circle(coord, iitc.constants.HACK_RANGE,
       { fill: false, color: iitc.constants.ACCESS_INDICATOR, weight: 2, clickable: false }
     ).addTo(map);
   }
@@ -250,9 +250,9 @@ window.setPortalIndicators = function(p) {
 // Returns true if it's still the same portal that just needs an
 // update.
 window.selectPortal = function(guid) {
-  var update = selectedPortal === guid;
-  var oldPortalGuid = selectedPortal;
-  selectedPortal = guid;
+  var update = iitc.selectedPortal === guid;
+  var oldPortalGuid = iitc.selectedPortal;
+  iitc.selectedPortal = guid;
 
   var oldPortal = iitc.portals[oldPortalGuid];
   var newPortal = iitc.portals[guid];

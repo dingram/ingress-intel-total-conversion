@@ -69,7 +69,7 @@ window.smartphoneInfo = function(data) {
   var guid = data.selectedPortalGuid;
   if(!iitc.portals[guid]) return;
 
-  var data = iitc.portals[selectedPortal].options.data;
+  var data = iitc.portals[iitc.selectedPortal].options.data;
   var details = window.portalDetail.get(guid);
 
   var lvl = data.level;
@@ -190,8 +190,8 @@ window.setAndroidPermalink = function() {
 
   var href = '/intel?ll='+lat+','+lng+'&z=' + map.getZoom();
 
-  if(window.selectedPortal && iitc.portals[window.selectedPortal]) {
-    var p = iitc.portals[window.selectedPortal].getLatLng();
+  if(iitc.selectedPortal && iitc.portals[iitc.selectedPortal]) {
+    var p = iitc.portals[iitc.selectedPortal].getLatLng();
     lat = Math.round(p.lat*1E6)/1E6;
     lng = Math.round(p.lng*1E6)/1E6;
     href += '&pll='+lat+','+lng;
