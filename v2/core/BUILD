@@ -3,29 +3,13 @@ load("//tools:uglify_js.bzl", "uglify_js")
 load("//tools:userjs.bzl", "userscript_binary")
 load("//tools:iitc.bzl", "iitc_plugin")
 
-package_group(
-    name="visibility",
-    packages=["//core/..."],
-)
-
 
 IITC_VERSION = '0.25.2'
 
 
 ts_library(
     name="iitc_lib",
-    deps=[
-        "//core/bootstrap",
-        "//core/data",
-        "//core/events",
-        "//core/gameinfo",
-        "//core/ingress",
-        "//core/map",
-        "//core/mobile",
-        "//core/plugins",
-        "//core/ui",
-        "//core/util",
-    ],
+    srcs=glob(["**/*.ts"], exclude=["*.d.ts"]),
 )
 
 ts_binary(
