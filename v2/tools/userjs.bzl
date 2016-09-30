@@ -58,6 +58,7 @@ def userscript_binary_impl(ctx):
       inputs=source_files + [output_meta],
       outputs=[output],
       command='cat %s %s <(echo) > %s' % (output_meta.path, ' '.join([f.path for f in source_files]), output.path),
+      progress_message='Adding userscript header to %s' % output.basename,
   )
 
 userscript_binary = rule(

@@ -40,7 +40,8 @@ def ts_binary_impl(ctx):
       inputs=files,
       outputs=[output, output_defs, output_map],
       command='tsc %s -d --sourceMap --out %s %s' % (
-          ' '.join(flags), output.path, ' '.join([f.path for f in files]))
+          ' '.join(flags), output.path, ' '.join([f.path for f in files])),
+      progress_message='Transpiling TypeScript to create %s' % output.basename,
   )
 
 ts_library = rule(

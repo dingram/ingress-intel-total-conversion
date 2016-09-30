@@ -39,6 +39,7 @@ def uglify_js_impl(ctx):
       inputs=all_files,
       outputs=outputs,
       command='uglifyjs %s %s' % (' '.join(flags), ' '.join([f.path for f in source_files])),
+      progress_message='Uglifying %s' % output.basename,
   )
 
 def _uglify_js_outputs(generate_source_map):
