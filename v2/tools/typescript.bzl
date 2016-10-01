@@ -1,3 +1,4 @@
+js_filetype = FileType(['.js'])
 ts_filetype = FileType(['.ts'])
 
 def get_transitive_files(ctx):
@@ -6,6 +7,11 @@ def get_transitive_files(ctx):
     s += dep.transitive_files
   s += ctx.files.srcs
   return s
+
+def js_library_impl(ctx):
+  return struct(
+      files=set(),
+      transitive_files=get_transitive_files(ctx))
 
 def ts_library_impl(ctx):
   return struct(
@@ -43,6 +49,14 @@ def ts_binary_impl(ctx):
           ' '.join(flags), output.path, ' '.join([f.path for f in files])),
       progress_message='Transpiling TypeScript to create %s' % output.basename,
   )
+
+js_library = rule(
+  implementation = js_library_impl,
+  attrs = {
+      'srcs': attr.label_list(allow_files=js_filetype),
+      'deps': attr.label_list(allow_files=False),
+  },
+)
 
 ts_library = rule(
   implementation = ts_library_impl,
