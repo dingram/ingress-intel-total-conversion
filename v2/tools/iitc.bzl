@@ -42,7 +42,7 @@ def _typescript_transpile(ctx, input_files, out_artifacts):
     flags.append('--removeComments')
 
   output_list = [out_artifacts.compiled, out_artifacts.typedecl]
-  if ctx.attr.generate_source_map:
+  if out_artifacts.srcmap:
     flags.append('--sourceMap')
     output_list.append(out_artifacts.srcmap)
 
@@ -68,14 +68,19 @@ def _uglify(ctx, in_artifacts, out_artifacts):
         '--keep-fnames',
         '-q 0',
     ]
-    inputs = [in_artifacts.compiled]
+    if hasattr(in_artifacts, 'compiled'):
+      inputs = [in_artifacts.compiled]
+    else:
+      inputs = in_artifacts
     outputs = [out_artifacts.compiled]
-    if ctx.attr.generate_source_map:
-      flags += ['--in-source-map', in_artifacts.srcmap.path]
+    if out_artifacts.srcmap:
+      if hasattr(in_artifacts, 'srcmap') and in_artifacts.srcmap:
+        flags += ['--in-source-map', in_artifacts.srcmap.path]
+        inputs.append(in_artifacts.srcmap)
+
       #if ctx.attr.source_root:
       #  flags += ['--source-map-root', ctx.file.source_map.path]
       flags += ['--source-map', '%s' % out_artifacts.srcmap.path]
-      inputs.append(in_artifacts.srcmap)
       outputs.append(out_artifacts.srcmap)
 
     flags += ['-o', '%s' % out_artifacts.compiled.path]
@@ -84,7 +89,7 @@ def _uglify(ctx, in_artifacts, out_artifacts):
         inputs=inputs,
         outputs=outputs,
         command='uglifyjs %s %s' % (' '.join(flags),
-                                    in_artifacts.compiled.path),
+                                    cmd_helper.join_paths(' ', set(inputs))),
         progress_message=('Uglifying %s' % out_artifacts.compiled.path),
     )
 
@@ -366,19 +371,19 @@ def _iitc_binary_impl(ctx):
 
   # Step 2: add inject wrapper
   # --------------------------
-  injected_artifacts = struct(
-      compiled=_intermediate_file(ctx, "injected.js"),
+  wrapped_artifacts = struct(
+      compiled=_intermediate_file(ctx, "wrapped.js"),
       srcmap=ts_artifacts.srcmap,
   )
-  _add_inject_wrapper(ctx, ts_artifacts, injected_artifacts)
+  _add_inject_wrapper(ctx, ts_artifacts, wrapped_artifacts)
 
   # Step 3: Preprocess
   # ------------------
   preprocessed_artifacts = struct(
       compiled=_intermediate_file(ctx, "preprocessed.js"),
-      srcmap=injected_artifacts.srcmap,
+      srcmap=wrapped_artifacts.srcmap,
   )
-  _run_iitc_processor(ctx, injected_artifacts, preprocessed_artifacts,
+  _run_iitc_processor(ctx, wrapped_artifacts, preprocessed_artifacts,
                       exclude=POSTPROCESS_STEPS)
 
   # Step 4: Uglify
@@ -405,18 +410,18 @@ def _iitc_binary_impl(ctx):
   )
   _add_userscript(ctx, uglify_artifacts, userscript_artifacts)
 
-  # Step 6: Preprocess
-  # ------------------
+  # Step 6: Postprocess
+  # -------------------
   postprocessed_userjs_artifacts = struct(
       compiled=out_userjs,
-      srcmap=injected_artifacts.srcmap,
+      srcmap=wrapped_artifacts.srcmap,
   )
   _run_iitc_processor(ctx, struct(compiled=userscript_artifacts.userjs),
                       postprocessed_userjs_artifacts, include=POSTPROCESS_STEPS)
 
   postprocessed_metajs_artifacts = struct(
       compiled=out_metajs,
-      srcmap=injected_artifacts.srcmap,
+      srcmap=wrapped_artifacts.srcmap,
   )
   _run_iitc_processor(ctx, struct(compiled=userscript_artifacts.metajs),
                       postprocessed_metajs_artifacts, include=POSTPROCESS_STEPS)
