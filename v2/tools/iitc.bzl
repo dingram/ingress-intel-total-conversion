@@ -94,7 +94,7 @@ def _uglify(ctx, in_artifacts, out_artifacts):
     )
 
 
-def _generate_userscript_block(id=None, script_name=None, category=None,
+def _generate_userscript_block(id=None, title=None, category=None,
                                version=None, base_url=None, rootname=None,
                                description=None, include=None, grant=None):
   meta_lines = [
@@ -103,8 +103,8 @@ def _generate_userscript_block(id=None, script_name=None, category=None,
 
   if id:
     meta_lines.append('// @id           %s' % id)
-  if script_name:
-    meta_lines.append('// @name         %s' % script_name)
+  if title:
+    meta_lines.append('// @name         %s' % title)
   if category:
     meta_lines.append('// @category     %s' % category)
   if version:
@@ -174,7 +174,7 @@ def _add_inject_wrapper(ctx, in_artifacts, out_artifacts):
   )
 
 
-def _add_userscript(ctx, in_artifacts, out_artifacts):
+def _add_userscript(ctx, in_artifacts, out_artifacts, metadata=None):
   include = [
       'https://www.ingress.com/intel*',
       'http://www.ingress.com/intel*',
@@ -184,15 +184,22 @@ def _add_userscript(ctx, in_artifacts, out_artifacts):
       'http://www.ingress.com/mission/*',
   ]
 
+  if not metadata:
+    metadata = {
+        'id': ctx.attr.id,
+        'title': ctx.attr.title,
+        'version': ctx.attr.version,
+        'base_url': ctx.attr.base_url,
+        'rootname': ctx.label.name,
+        'description': ctx.attr.description,
+        'category': (ctx.attr.category if hasattr(ctx.attr, 'category')
+                     else None),
+    }
+
   meta_block = _generate_userscript_block(
-      id=ctx.attr.id,
-      script_name=ctx.attr.title,
-      version=ctx.attr.version,
-      base_url=ctx.attr.base_url,
-      rootname=ctx.label.name,
-      description=ctx.attr.description,
       include=include,
       grant=['none'],
+      **metadata
   )
 
   ctx.file_action(
