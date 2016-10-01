@@ -10,8 +10,8 @@ def get_transitive_files(ctx):
 
 def uglify_js_impl(ctx):
   all_files = list(get_transitive_files(ctx))
-  source_files = [f for f in all_files if f.basename.endswith('.js')]
-  map_files = [f for f in all_files if f.basename.endswith('.js.map')]
+  source_files = js_filetype.filter(all_files)
+  map_files = js_map_filetype.filter(all_files)
 
   output = ctx.outputs.out
   outputs = [output]

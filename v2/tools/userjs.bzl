@@ -9,7 +9,7 @@ def get_transitive_files(ctx):
 
 def userscript_binary_impl(ctx):
   all_files = list(get_transitive_files(ctx))
-  source_files = [f for f in all_files if f.basename.endswith('.js')]
+  source_files = js_filetype.filter(all_files)
 
   output = ctx.outputs.out
   output_meta = ctx.outputs.meta_out
