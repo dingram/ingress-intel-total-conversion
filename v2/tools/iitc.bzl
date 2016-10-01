@@ -69,7 +69,10 @@ def _uglify(ctx, in_artifacts, out_artifacts):
         '-q 0',
     ]
     if hasattr(in_artifacts, 'compiled'):
-      inputs = [in_artifacts.compiled]
+      if type(in_artifacts.compiled) == 'list':
+        inputs = in_artifacts.compiled
+      else:
+        inputs = [in_artifacts.compiled]
     else:
       inputs = in_artifacts
     outputs = [out_artifacts.compiled]
@@ -285,6 +288,16 @@ def _run_iitc_processor(ctx, in_artifacts, out_artifacts, include=[],
   )
 
 
+def _combine_files(ctx, in_files, outfile):
+  ctx.action(
+      inputs=in_files,
+      outputs=[outfile],
+      command='cat %s > %s' % (cmd_helper.join_paths(' ', set(in_files)),
+                               outfile.path),
+      progress_message=('Combining source files to %s' % outfile.path),
+  )
+
+
 def _get_transitive_files(ctx):
   s = set()
   if hasattr(ctx.attr, 'deps'):
@@ -421,13 +434,7 @@ def _iitc_js_plugin_impl(ctx):
 
   combined = _intermediate_file(ctx, "combined.js")
 
-  ctx.action(
-      inputs=all_files,
-      outputs=[combined],
-      command='cat %s > %s' % (cmd_helper.join_paths(' ', set(all_files)),
-                               combined.path),
-      progress_message=('Combining source files to %s' % combined.path),
-  )
+  _combine_files(ctx, all_files, combined)
 
   _iitc_plugin(ctx, combined, out_userjs, out_metajs)
 
@@ -542,15 +549,24 @@ def _iitc_binary_impl(ctx):
   ts_files = ts_filetype.filter(all_files)
   _typescript_transpile(ctx, ts_files, ts_artifacts)
 
-  # Step 2: add inject wrapper
+  # Step 2: combine dependencies
+  # ----------------------------
+  combined_artifacts = struct(
+      inputs=list(js_filetype.filter(all_files)) + [ts_artifacts.compiled],
+      compiled=_intermediate_file(ctx, "combined.js"),
+      srcmap=ts_artifacts.srcmap,
+  )
+  _combine_files(ctx, combined_artifacts.inputs, combined_artifacts.compiled)
+
+  # Step 3: add inject wrapper
   # --------------------------
   wrapped_artifacts = struct(
       compiled=_intermediate_file(ctx, "wrapped.js"),
       srcmap=ts_artifacts.srcmap,
   )
-  _add_inject_wrapper(ctx, ts_artifacts, wrapped_artifacts)
+  _add_inject_wrapper(ctx, combined_artifacts, wrapped_artifacts)
 
-  # Step 3: Preprocess
+  # Step 4: Preprocess
   # ------------------
   preprocessed_artifacts = struct(
       compiled=_intermediate_file(ctx, "preprocessed.js"),
@@ -559,10 +575,10 @@ def _iitc_binary_impl(ctx):
   _run_iitc_processor(ctx, wrapped_artifacts, preprocessed_artifacts,
                       exclude=POSTPROCESS_STEPS)
 
-  # Step 4: Uglify
+  # Step 5: Uglify
   # --------------
   if ctx.attr.mode == 'dev':
-    # Skip in dev mode
+    # No uglification in dev mode, but still need to combine scripts
     uglify_artifacts = struct(
         compiled=preprocessed_artifacts.compiled,
         srcmap=preprocessed_artifacts.srcmap,
@@ -575,7 +591,7 @@ def _iitc_binary_impl(ctx):
     )
     _uglify(ctx, preprocessed_artifacts, uglify_artifacts)
 
-  # Step 5: userscript block
+  # Step 6: userscript block
   # ------------------------
   userscript_artifacts = struct(
       userjs=_intermediate_file(ctx, "userscript.user.js"),
@@ -583,7 +599,7 @@ def _iitc_binary_impl(ctx):
   )
   _add_userscript(ctx, uglify_artifacts, userscript_artifacts)
 
-  # Step 6: Postprocess
+  # Step 7: Postprocess
   # -------------------
   postprocessed_userjs_artifacts = struct(
       compiled=out_userjs,
@@ -599,7 +615,7 @@ def _iitc_binary_impl(ctx):
   _run_iitc_processor(ctx, struct(compiled=userscript_artifacts.metajs),
                       postprocessed_metajs_artifacts, include=POSTPROCESS_STEPS)
 
-  # Step 7: fix outputs
+  # Step 8: fix outputs
   # -------------------
   ctx.action(
       inputs=[ts_artifacts.typedecl],
