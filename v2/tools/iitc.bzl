@@ -222,12 +222,10 @@ def _add_plugin_wrapper(ctx, in_artifacts, out_artifacts, plugin_deps):
 
 def _add_userscript(ctx, in_artifacts, out_artifacts, metadata=None):
   include = [
-      'https://www.ingress.com/intel*',
-      'http://www.ingress.com/intel*',
-      'https://www.ingress.com/mission*',
-      'http://www.ingress.com/mission*',
-      'https://www.ingress.com/mission/*',
-      'http://www.ingress.com/mission/*',
+      'https://*.ingress.com/intel*',
+      'http://*.ingress.com/intel*',
+      'https://*.ingress.com/mission*',
+      'http://*.ingress.com/mission*',
   ]
 
   if not metadata:
