@@ -210,7 +210,7 @@ def _add_userscript(ctx, in_artifacts, out_artifacts, metadata=None):
   ctx.action(
       inputs=[in_artifacts.compiled, out_artifacts.metajs],
       outputs=[out_artifacts.userjs],
-      command='cat %s %s <(echo) > %s' % (out_artifacts.metajs.path,
+      command='cat %s <(echo) %s > %s' % (out_artifacts.metajs.path,
                                           in_artifacts.compiled.path,
                                           out_artifacts.userjs.path),
       progress_message=('Adding userscript header to %s' %
