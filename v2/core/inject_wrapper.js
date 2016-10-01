@@ -44,7 +44,7 @@ var info = {
   dateTimeVersion: '@@DATETIMEVERSION@@'
 };
 
-if (this.GM_info && this.GM_info.script) {
+if (GM_info && GM_info.script) {
   info.script = {
     version: GM_info.script.version,
     name: GM_info.script.name,
@@ -52,7 +52,7 @@ if (this.GM_info && this.GM_info.script) {
   };
 }
 
-// Stringify the wrapper, insert it into the page, and immediately execute.
+// Stringify the wrapper, inject it into the page, and immediately execute.
 var script = document.createElement('script');
 script.appendChild(document.createTextNode('(' + wrapper + ')(' + JSON.stringify(info) + ');'));
 (document.body || document.head || document.documentElement).appendChild(script);
