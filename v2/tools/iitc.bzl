@@ -25,6 +25,7 @@ def _typescript_transpile(ctx, input_files, out_artifacts):
   flags = [
       '--strictNullChecks',
       '-d',
+      '-t ES5',
   ]
 
   if ctx.attr.mode == 'strict':
@@ -63,6 +64,8 @@ def _uglify(ctx, in_artifacts, out_artifacts):
     flags = [
         '-c',
         '-m',
+        '--keep-fnames',
+        '-q 0',
     ]
     inputs = [in_artifacts.compiled]
     outputs = [out_artifacts.compiled]
