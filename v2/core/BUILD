@@ -5,8 +5,9 @@ load("//tools:iitc.bzl", "iitc_binary")
 IITC_VERSION = '0.25.2'
 
 ts_library(
-    name="iitc_typedecls",
+    name="typedecls",
     srcs=glob(["**/*.d.ts"]),
+    visibility=["//visibility:public"],
 )
 
 ts_library(
@@ -19,7 +20,7 @@ iitc_binary(
     name="iitc",
     deps=[
         ":iitc_lib",
-        ":iitc_typedecls",
+        ":typedecls",
     ],
     version=IITC_VERSION,
     mode="strict",
@@ -30,7 +31,7 @@ iitc_binary(
     name="iitc.dev",
     deps=[
         ":iitc_lib",
-        ":iitc_typedecls",
+        ":typedecls",
     ],
     version=IITC_VERSION,
     mode="dev",
@@ -41,7 +42,7 @@ iitc_binary(
     name="iitc.loose",
     deps=[
         ":iitc_lib",
-        ":iitc_typedecls",
+        ":typedecls",
     ],
     version=IITC_VERSION,
     mode="loose",
@@ -52,7 +53,7 @@ iitc_binary(
     name="iitc-exp",
     deps=[
         ":iitc_lib",
-        ":iitc_typedecls",
+        ":typedecls",
     ],
     version=IITC_VERSION,
     mode="strict",
