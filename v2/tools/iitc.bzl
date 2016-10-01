@@ -174,6 +174,49 @@ def _add_inject_wrapper(ctx, in_artifacts, out_artifacts):
   )
 
 
+def _add_plugin_wrapper(ctx, in_artifacts, out_artifacts, plugin_deps):
+  plugin_pre = _intermediate_file(ctx, "plugin_pre.js")
+  plugin_post = _intermediate_file(ctx, "plugin_post.js")
+
+  ctx.action(
+      inputs=[ctx.file._plugin_wrapper],
+      outputs=[plugin_pre],
+      command=('sed -ne "1,/^\'@@PLUGIN_CODE@@\';\$/'
+               + '{ /^\'@@PLUGIN_CODE@@\';\$/d; p; }" %s > %s' % (
+                   ctx.file._plugin_wrapper.path,
+                   plugin_pre.path,
+                   )),
+      progress_message=('Preparing plugin wrapper for %s' %
+                        out_artifacts.compiled.path),
+  )
+
+  ctx.action(
+      inputs=[ctx.file._plugin_wrapper],
+      outputs=[plugin_post],
+      command=('sed -ne "/^\'@@PLUGIN_CODE@@\';\$/,\$'
+               + '{ s/^\'@@PLUGIN_CODE@@\';\$//; p; }" %s > %s' % (
+                   ctx.file._plugin_wrapper.path,
+                   plugin_post.path,
+                   )),
+      progress_message=('Preparing plugin wrapper for %s' %
+                        out_artifacts.compiled.path),
+  )
+
+  if hasattr(in_artifacts, 'compiled'):
+    input = in_artifacts.compiled
+  else:
+    input = in_artifacts
+  ctx.action(
+      inputs=[plugin_pre, input, plugin_post],
+      outputs=[out_artifacts.compiled],
+      command='cat %s %s %s | sed -re "s/@@PLUGIN_DEPS@@/%s/" > %s' % (
+          plugin_pre.path, input.path, plugin_post.path,
+          ','.join(plugin_deps), out_artifacts.compiled.path),
+      progress_message=('Preparing plugin wrapper for %s' %
+                        out_artifacts.compiled.path),
+  )
+
+
 def _add_userscript(ctx, in_artifacts, out_artifacts, metadata=None):
   include = [
       'https://www.ingress.com/intel*',
@@ -305,49 +348,167 @@ def iitc_postprocess(name, srcs=[], deps=[]):
 ########################################################################
 # Plugin builder
 ########################################################################
+def _iitc_plugin(ctx, inputs, out_userjs, out_metajs, srcmap=None):
+  # Step 1: add plugin wrapper
+  # --------------------------
+  wrapped_artifacts = struct(
+      compiled=_intermediate_file(ctx, "wrapped.js"),
+      srcmap=inputs.srcmap if hasattr(inputs, 'srcmap') else None,
+  )
+  _add_plugin_wrapper(ctx, inputs, wrapped_artifacts,
+                      ctx.attr.plugin_deps)
 
-def _iitc_js_plugin_impl(name, base, id, title, version, description):
-  pass
+  # Step 2: Preprocess
+  # ------------------
+  preprocessed_artifacts = struct(
+      compiled=_intermediate_file(ctx, "preprocessed.js"),
+      srcmap=wrapped_artifacts.srcmap,
+  )
+  _run_iitc_processor(ctx, wrapped_artifacts, preprocessed_artifacts,
+                      exclude=POSTPROCESS_STEPS)
+
+  # Step 3: Uglify
+  # --------------
+  if ctx.attr.mode == 'dev':
+    # Skip in dev mode
+    uglify_artifacts = struct(
+        compiled=preprocessed_artifacts.compiled,
+        srcmap=preprocessed_artifacts.srcmap,
+    )
+  else:
+    uglify_artifacts = struct(
+        compiled=_intermediate_file(ctx, "uglified.js"),
+        srcmap=None,
+    )
+    _uglify(ctx, preprocessed_artifacts, uglify_artifacts)
+
+  # Step 4: userscript block
+  # ------------------------
+  userscript_artifacts = struct(
+      userjs=_intermediate_file(ctx, "userscript.user.js"),
+      metajs=_intermediate_file(ctx, "userscript.meta.js"),
+  )
+  _add_userscript(ctx, uglify_artifacts, userscript_artifacts,
+                  metadata=ctx.attr.metadata)
+
+  # Step 5: Postprocess
+  # -------------------
+  postprocessed_userjs_artifacts = struct(
+      compiled=out_userjs,
+      srcmap=wrapped_artifacts.srcmap,
+  )
+  _run_iitc_processor(ctx, struct(compiled=userscript_artifacts.userjs),
+                      postprocessed_userjs_artifacts, include=POSTPROCESS_STEPS)
+
+  postprocessed_metajs_artifacts = struct(
+      compiled=out_metajs,
+      srcmap=wrapped_artifacts.srcmap,
+  )
+  _run_iitc_processor(ctx, struct(compiled=userscript_artifacts.metajs),
+                      postprocessed_metajs_artifacts, include=POSTPROCESS_STEPS)
 
 
-def _iitc_ts_plugin_impl(name, base, id, title, version, description):
-  pass
+def _iitc_js_plugin_impl(ctx):
+  all_files = list(_get_transitive_files(ctx))
+
+  out_userjs = ctx.outputs.userjs
+  out_metajs = ctx.outputs.metajs
+
+  combined = _intermediate_file(ctx, "combined.js")
+
+  ctx.action(
+      inputs=all_files,
+      outputs=[combined],
+      command='cat %s > %s' % (cmd_helper.join_paths(' ', set(all_files)),
+                               combined.path),
+      progress_message=('Combining source files to %s' % combined.path),
+  )
+
+  _iitc_plugin(ctx, combined, out_userjs, out_metajs)
+
+
+def _iitc_ts_plugin_impl(ctx):
+  all_files = list(_get_transitive_files(ctx))
+
+  out_userjs = ctx.outputs.userjs
+  out_metajs = ctx.outputs.metajs
+  out_typedecl = ctx.outputs.typedecl
+
+  # Step 1: Transpile
+  # -----------------
+  ts_artifacts = struct(
+      compiled=_intermediate_file(ctx, "compiled.js"),
+      typedecl=_intermediate_file(ctx, "compiled.d.ts"),
+      srcmap=None,
+  )
+
+  ts_files = ts_filetype.filter(all_files)
+  _typescript_transpile(ctx, ts_files, ts_artifacts)
+
+  # Step 2: Do the rest of the plugin stuff
+  # ---------------------------------------
+  _iitc_plugin(ctx, ts_artifacts.compiled, out_userjs, out_metajs)
+
+  # Step 3: Fix outputs
+  # -------------------
+  ctx.action(
+      inputs=[ts_artifacts.typedecl],
+      outputs=[out_typedecl],
+      command='cp %s %s' % (ts_artifacts.typedecl.path, out_typedecl.path),
+      progress_message='Preparing typedecl %s' % out_typedecl.path,
+  )
 
 
 iitc_js_plugin = rule(
     implementation = _iitc_js_plugin_impl,
     attrs = {
-        'deps': attr.label_list(allow_files=js_filetype),
         'srcs': attr.label_list(allow_files=js_filetype),
-        'id': attr.string(mandatory=True),
-        'title': attr.string(mandatory=True),
-        'version': attr.string(mandatory=True),
-        'description': attr.string(mandatory=True),
+        'deps': attr.label_list(allow_files=False),
+        'metadata': attr.string_dict(mandatory=True),
         'base_url': attr.string(default=BASE_URL),
+        'plugin_deps': attr.string_list(),
+        'mode': attr.string(values=['loose', 'strict', 'dev'], default='loose'),
+
+        '_plugin_wrapper': attr.label(
+            default=Label('//tools:plugin_wrapper.js'),
+            allow_single_file=True,
+            executable=False,
+        ),
+        '_processor': attr.label(
+            default=Label('//tools:iitc_processor'),
+            executable=True,
+        ),
     },
     outputs = {
-        'out': '%{name}.user.js',
-        'meta_out': '%{name}.meta.js',
-        'map_out': '%{name}.js.map',
+        'userjs': '%{name}.user.js',
+        'metajs': '%{name}.meta.js',
     },
 )
 
 iitc_ts_plugin = rule(
-    implementation = _iitc_js_plugin_impl,
+    implementation = _iitc_ts_plugin_impl,
     attrs = {
-        'srcs': attr.label_list(allow_files=js_filetype),
-        'deps': attr.label_list(allow_files=js_filetype),
-        'id': attr.string(mandatory=True),
-        'title': attr.string(mandatory=True),
-        'version': attr.string(mandatory=True),
-        'description': attr.string(mandatory=True),
+        'srcs': attr.label_list(allow_files=ts_filetype),
+        'deps': attr.label_list(allow_files=False),
+        'metadata': attr.string_dict(mandatory=True),
         'base_url': attr.string(default=BASE_URL),
+        'plugin_deps': attr.string_list(),
+        'mode': attr.string(values=['loose', 'strict', 'dev'], default='loose'),
+
+        '_plugin_wrapper': attr.label(
+            default=Label('//tools:plugin_wrapper.js'),
+            allow_single_file=True,
+            executable=False,
+        ),
+        '_processor': attr.label(
+            default=Label('//tools:iitc_processor'),
+            executable=True,
+        ),
     },
     outputs = {
-        'out': '%{name}.user.js',
-        'meta_out': '%{name}.meta.js',
-        'map_out': '%{name}.js.map',
-        'typedecl_out': '%{name}.d.ts',
+        'userjs': '%{name}.user.js',
+        'metajs': '%{name}.meta.js',
+        'typedecl': '%{name}.d.ts',
     },
 )
 
