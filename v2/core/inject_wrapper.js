@@ -11,7 +11,7 @@ document.body.onload = function() {};
 //however, that's already been executed, so we can just access PLAYER - no messing around needed!
 
 if (typeof(window.PLAYER)!="object" || typeof(window.PLAYER.nickname) != "string") {
-  // page doesn’t have a script tag with player information.
+  // page doesn't have a script tag with player information.
   if(document.getElementById('header_email')) {
     // however, we are logged in.
     // it used to be regularly common to get temporary 'account not enabled' messages from the intel site.
@@ -25,7 +25,7 @@ if (typeof(window.PLAYER)!="object" || typeof(window.PLAYER.nickname) != "string
 }
 
 
-// remove complete page. We only wanted the user-data and the page’s
+// remove complete page. We only wanted the user-data and the page's
 // security context so we can access the API easily. Setup as much as
 // possible without requiring scripts.
 document.getElementsByTagName('head')[0].innerHTML = ''
@@ -77,7 +77,7 @@ document.getElementsByTagName('body')[0].innerHTML = ''
   + '<div id="play_button"></div>';
 
 // putting everything in a wrapper function that in turn is placed in a
-// script tag on the website allows us to execute in the site’s context
+// script tag on the website allows us to execute in the site's context
 // instead of in the Greasemonkey/Extension/etc. context.
 function wrapper(info) {
 
