@@ -51,7 +51,7 @@ def _typescript_transpile(ctx, input_files, out_artifacts):
       out_artifacts.compiled.path,
   ]
 
-  paths = ' '.join([f.path for f in input_files])
+  paths = cmd_helper.join_paths(' ', set(input_files))
   ctx.action(
       inputs=input_files,
       outputs=output_list,
@@ -361,7 +361,8 @@ def _iitc_binary_impl(ctx):
               if ctx.attr.generate_source_map else None),
   )
 
-  _typescript_transpile(ctx, ts_filetype.filter(all_files), ts_artifacts)
+  ts_files = ts_filetype.filter(all_files)
+  _typescript_transpile(ctx, ts_files, ts_artifacts)
 
   # Step 2: add inject wrapper
   # --------------------------
