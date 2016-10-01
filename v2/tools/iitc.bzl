@@ -7,6 +7,7 @@ BASE_URL = 'https://iitc.me/stable/'
 
 js_filetype = FileType(['.js'])
 ts_filetype = FileType(['.ts'])
+ts_decl_filetype = FileType(['.d.ts'])
 js_or_ts_filetype = FileType(['.js', '.ts'])
 js_map_filetype = FileType(['.js.map'])
 userscript_filetype = FileType(['.user.js', '.meta.js'])
