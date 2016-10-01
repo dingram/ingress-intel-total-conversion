@@ -1,59 +1,34 @@
-load("//tools:typescript.bzl", "ts_binary", "ts_library")
-load("//tools:uglify_js.bzl", "uglify_js")
-load("//tools:userjs.bzl", "userscript_binary")
-load("//tools:iitc.bzl", "iitc_plugin")
+load("//tools:typescript.bzl", "ts_library")
+load("//tools:iitc.bzl", "iitc_binary")
 
 
 IITC_VERSION = '0.25.2'
-
 
 ts_library(
     name="iitc_lib",
     srcs=glob(["**/*.ts"], exclude=["*.d.ts"]),
 )
 
-ts_binary(
-    name="iitc_raw",
-    deps=[":iitc_lib"],
-    remove_comments=False,
-)
-
-ts_binary(
-    name="iitc_strict",
-    deps=[":iitc_lib"],
-    remove_comments=False,
-    super_strict=True,
-)
-
-ts_binary(
-    name="iitc_build",
-    deps=[":iitc_lib"],
-    remove_comments=True,
-)
-
-uglify_js(
-    name="iitc_uglified",
-    deps=[":iitc_build"],
-)
-
-iitc_plugin(
+# Production build
+iitc_binary(
     name="iitc",
-    base=":iitc_uglified",
-
-    # metadata
-    id='ingress-intel-total-conversion@jonatkins',
-    title='IITC: Ingress intel map total conversion',
+    deps=[":iitc_lib"],
     version=IITC_VERSION,
-    description='Total conversion for the Ingress intel map.',
+    mode="strict",
 )
 
-iitc_plugin(
-    name="iitc-dev",
-    base=":iitc_raw",
-
-    # metadata
-    id='ingress-intel-total-conversion@jonatkins',
-    title='IITC: Ingress intel map total conversion (dev build)',
+# Development build: no minfication
+iitc_binary(
+    name="iitc.dev",
+    deps=[":iitc_lib"],
     version=IITC_VERSION,
-    description='Total conversion for the Ingress intel map.',
+    mode="dev",
+)
+
+# Loose build: less strict than production
+iitc_binary(
+    name="iitc.loose",
+    deps=[":iitc_lib"],
+    version=IITC_VERSION,
+    mode="loose",
 )
