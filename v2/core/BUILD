@@ -65,7 +65,7 @@ genrule(
     name="upload-exp",
     outs=["upload-exp.sh"],
     srcs=[":iitc-exp"],
-    cmd='echo "#!/bin/bash\nset +x\ngsutil -m cp $(SRCS) gs://experimental.iitc.me/v2/" > $@',
+    cmd='echo "#!/bin/bash\nset +x\ngsutil -m -h Cache-Control:private,\\ max-age=0,\\ no-transform cp -z js,ts -a public-read $(SRCS) gs://experimental.iitc.me/v2/" > $@',
     executable=1,
     output_to_bindir=1,
 )
