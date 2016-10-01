@@ -202,6 +202,26 @@ def _add_userscript(ctx, in_artifacts, out_artifacts):
   )
 
 
+def _run_iitc_processor(ctx, in_artifacts, out_artifacts, include=[],
+                        exclude=[]):
+  args = [
+      '--infile', in_artifacts.compiled.path,
+      '--outfile', out_artifacts.compiled.path,
+  ]
+  if include:
+    args += ['--include', ','.join(include)]
+  if exclude:
+    args += ['--exclude', ','.join(exclude)]
+
+  ctx.action(
+      inputs=[in_artifacts.compiled],
+      outputs=[out_artifacts.compiled],
+      executable=ctx.executable._processor,
+      arguments=args,
+      progress_message='Processing %s' % out_artifacts.compiled.path,
+  )
+
+
 def _get_transitive_files(ctx):
   s = set()
   if hasattr(ctx.attr, 'deps'):
@@ -231,7 +251,7 @@ iitc_process = rule(
         'replace': attr.string_list(),
         'exclude': attr.string_list(),
 
-        '_compiler': attr.label(
+        '_processor': attr.label(
             default=Label('//tools:iitc_processor'),
             allow_single_file=True,
             executable=True,
@@ -347,13 +367,22 @@ def _iitc_binary_impl(ctx):
   )
   _add_inject_wrapper(ctx, ts_artifacts, injected_artifacts)
 
-  # Step 3: Uglify
+  # Step 3: Preprocess
+  # ------------------
+  preprocessed_artifacts = struct(
+      compiled=_intermediate_file(ctx, "preprocessed.js"),
+      srcmap=injected_artifacts.srcmap,
+  )
+  _run_iitc_processor(ctx, injected_artifacts, preprocessed_artifacts,
+                      exclude=POSTPROCESS_STEPS)
+
+  # Step 4: Uglify
   # --------------
   if ctx.attr.mode == 'dev':
     # Skip in dev mode
     uglify_artifacts = struct(
-        compiled=injected_artifacts.compiled,
-        srcmap=injected_artifacts.srcmap,
+        compiled=preprocessed_artifacts.compiled,
+        srcmap=preprocessed_artifacts.srcmap,
     )
   else:
     uglify_artifacts = struct(
@@ -361,17 +390,33 @@ def _iitc_binary_impl(ctx):
         srcmap=(_intermediate_file(ctx, "uglified.js.map")
                 if ctx.attr.generate_source_map else None),
     )
-    _uglify(ctx, injected_artifacts, uglify_artifacts)
+    _uglify(ctx, preprocessed_artifacts, uglify_artifacts)
 
-  # Step 4: userscript block
+  # Step 5: userscript block
   # ------------------------
   userscript_artifacts = struct(
-      userjs=out_userjs,
-      metajs=out_metajs,
+      userjs=_intermediate_file(ctx, "userscript.user.js"),
+      metajs=_intermediate_file(ctx, "userscript.meta.js"),
   )
   _add_userscript(ctx, uglify_artifacts, userscript_artifacts)
 
-  # Step 5: fix outputs
+  # Step 6: Preprocess
+  # ------------------
+  postprocessed_userjs_artifacts = struct(
+      compiled=out_userjs,
+      srcmap=injected_artifacts.srcmap,
+  )
+  _run_iitc_processor(ctx, struct(compiled=userscript_artifacts.userjs),
+                      postprocessed_userjs_artifacts, include=POSTPROCESS_STEPS)
+
+  postprocessed_metajs_artifacts = struct(
+      compiled=out_metajs,
+      srcmap=injected_artifacts.srcmap,
+  )
+  _run_iitc_processor(ctx, struct(compiled=userscript_artifacts.metajs),
+                      postprocessed_metajs_artifacts, include=POSTPROCESS_STEPS)
+
+  # Step 7: fix outputs
   # -------------------
   ctx.action(
       inputs=[ts_artifacts.typedecl],
@@ -418,6 +463,10 @@ iitc_binary = rule(
             default=Label('//core:inject_wrapper.js'),
             allow_single_file=True,
             executable=False,
+        ),
+        '_processor': attr.label(
+            default=Label('//tools:iitc_processor'),
+            executable=True,
         ),
     },
     outputs = _iitc_binary_outputs,
