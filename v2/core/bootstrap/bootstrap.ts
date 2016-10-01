@@ -3,6 +3,9 @@ namespace iitc {
 }
 
 namespace iitc.bootstrap {
+  // NOTE: no protocol - uses http or https as used on the current page
+  const JQUERY = '//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js';
+  const JQUERY_UI = '//ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js';
 
   export function init() : void {
     console.log("Let's get this show on the road!");
@@ -67,6 +70,8 @@ namespace iitc.bootstrap {
   }
 
   function loadExternalScripts() : void {
-    boot();
+    load(JQUERY)
+      .then(JQUERY_UI)
+      .thenRun(boot);
   }
 }

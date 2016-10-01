@@ -21,6 +21,9 @@ ts_library(
 ts_library(
     name="iitc_lib",
     srcs=glob(["**/*.ts"], exclude=["*.d.ts"]),
+    deps=[
+        "//third_party/loadjs",
+    ],
 )
 
 # Production build
