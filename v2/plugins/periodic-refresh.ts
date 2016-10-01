@@ -11,4 +11,4 @@ namespace periodicRefresh {
 
 }
 
-window.plugin.periodicRefresh = periodicRefresh;
+(window.plugin || (window.plugin = {})).periodicRefresh = periodicRefresh;
