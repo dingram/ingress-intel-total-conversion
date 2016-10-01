@@ -233,11 +233,15 @@ def _add_userscript(ctx, in_artifacts, out_artifacts, metadata=None):
         'title': ctx.attr.title,
         'version': ctx.attr.version,
         'base_url': ctx.attr.base_url,
-        'rootname': ctx.label.name,
         'description': ctx.attr.description,
         'category': (ctx.attr.category if hasattr(ctx.attr, 'category')
                      else None),
     }
+
+  if 'base_url' not in metadata:
+    metadata['base_url'] = BASE_URL
+  if 'rootname' not in metadata:
+    metadata['rootname'] = ctx.label.name
 
   meta_block = _generate_userscript_block(
       include=include,
@@ -388,8 +392,9 @@ def _iitc_plugin(ctx, inputs, out_userjs, out_metajs, srcmap=None):
       userjs=_intermediate_file(ctx, "userscript.user.js"),
       metajs=_intermediate_file(ctx, "userscript.meta.js"),
   )
+  metadata = ctx.attr.metadata + {'base_url': ctx.attr.base_url}
   _add_userscript(ctx, uglify_artifacts, userscript_artifacts,
-                  metadata=ctx.attr.metadata)
+                  metadata=metadata)
 
   # Step 5: Postprocess
   # -------------------
