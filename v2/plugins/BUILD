@@ -11,7 +11,10 @@ ALL_ROOTNAMES = TS_ROOTNAMES + JS_ROOTNAMES
     [iitc_ts_plugin(
         name=f + ("" if m == "strict" else (".%s" % m)),
         srcs=["%s.ts" % f],
-        deps=["//core:typedecls"],
+        deps=[
+            "//core:typedecls",
+            "//core:iitc_typedecl",
+        ],
         metadata=lookup_plugin(f),
         mode="strict" if m == "exp" else m,
         base_url="https://experimental.iitc.me/v2/" if m == "exp" else None,

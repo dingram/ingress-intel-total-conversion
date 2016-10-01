@@ -37,6 +37,12 @@ iitc_binary(
     mode="strict",
 )
 
+ts_library(
+    name="iitc_typedecl",
+    srcs=[":iitc.d.ts"],
+    visibility=["//visibility:public"],
+)
+
 # Development build: no minfication
 iitc_binary(
     name="iitc.dev",
