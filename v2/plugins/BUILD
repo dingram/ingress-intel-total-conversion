@@ -1,6 +1,7 @@
 load("//tools:iitc.bzl", "iitc_js_plugin", "iitc_ts_plugin")
 load(":registry.bzl", "lookup_plugin")
 
+# Typescript plugins
 [
     [iitc_ts_plugin(
         name=f[:-3] + ("" if m == "strict" else (".%s" % m)),
@@ -12,6 +13,7 @@ load(":registry.bzl", "lookup_plugin")
     ) for m in ["strict", "dev", "exp"]]
 for f in glob(["*.ts"], exclude=["*.d.ts"])]
 
+# Javascript plugins
 [
     [iitc_js_plugin(
         name=f[:-3] + ("" if m == "strict" else (".%s" % m)),
@@ -22,7 +24,7 @@ for f in glob(["*.ts"], exclude=["*.d.ts"])]
     ) for m in ["strict", "dev", "exp"]]
 for f in glob(["*.js"])]
 
-# Upload experimental build
+# Upload experimental plugin builds
 genrule(
     name="upload-exp",
     outs=["upload-exp.sh"],
