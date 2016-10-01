@@ -1,12 +1,20 @@
 load("//tools:typescript.bzl", "ts_library")
 load("//tools:iitc.bzl", "iitc_binary")
 
+package_group(
+    name="visibility",
+    packages=["//core/..."],
+)
+
 
 IITC_VERSION = '0.25.2'
 
 ts_library(
     name="typedecls",
     srcs=glob(["**/*.d.ts"]),
+    deps=[
+        "//third_party/typedecls",
+    ],
     visibility=["//visibility:public"],
 )
 
