@@ -85,7 +85,6 @@ namespace iitc.bootstrap {
     iitc.idle.setup();
     // setupTaphold();
     setupStyles();
-    // setupDialogs();
     // setupDataTileParams();
     // setupMap();
     // setupOMS();
