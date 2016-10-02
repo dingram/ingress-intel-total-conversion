@@ -86,7 +86,7 @@ namespace iitc.bootstrap {
     // setupTaphold();
     setupStyles();
     // setupDataTileParams();
-    // setupMap();
+    iitc.map.setup();
     // setupOMS();
     // search.setup();
     // setupRedeem();
