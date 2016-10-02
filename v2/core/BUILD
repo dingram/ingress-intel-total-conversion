@@ -11,6 +11,8 @@ IITC_VERSION = '1.99.9'
 ASSETS = [
     "assets/css/style.css",
     "assets/images/current-location.png",
+    "assets/images/marker-icon.png",
+    "assets/images/marker-icon-2x.png",
 ]
 
 ts_library(

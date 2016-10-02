@@ -3,18 +3,19 @@ namespace iitc {
 }
 
 namespace iitc.bootstrap {
+  const JQUERY_VERSION = '2.1.3';
+  const JQUERY_UI_VERSION = '1.11.3';
+  const LEAFLET_VERSION = '0.7.4';
+
   // NOTE: no protocol - uses http or https as used on the current page
-  const JQUERY = '//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js';
-  const JQUERY_UI = '//ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js';
+  const JQUERY = `//ajax.googleapis.com/ajax/libs/jquery/${JQUERY_VERSION}/jquery.min.js`;
+  const JQUERY_UI = `//ajax.googleapis.com/ajax/libs/jqueryui/${JQUERY_UI_VERSION}/jquery-ui.min.js`;
+  const LEAFLET = `https://unpkg.com/leaflet@${LEAFLET_VERSION}/dist/leaflet.js`;
 
   export function init() : void {
     console.log("Let's get this show on the road!");
     replacePageContent();
     loadExternalScripts();
-  }
-
-  export function boot() : void {
-    console.log('IITCv2 booted.');
   }
 
   function replacePageContent() : void {
@@ -24,7 +25,7 @@ namespace iitc.bootstrap {
     document.getElementsByTagName('head')[0].innerHTML = ''
       + '<title>Ingress Intel Map</title>'
       + '<style>@@INCLUDESTRING:style.css@@</style>'
-      + '<style>@@INCLUDESTRING: leaflet.css@@</style>'
+      + `<link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet@${LEAFLET_VERSION}/dist/leaflet.css"/>`
       + '<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,400,400italic,500,500italic,700,700italic&subset=latin,cyrillic-ext,greek-ext,greek,vietnamese,latin-ext,cyrillic"/>';
 
 
@@ -71,7 +72,52 @@ namespace iitc.bootstrap {
 
   function loadExternalScripts() : void {
     load(JQUERY)
+      .then(LEAFLET)
       .then(JQUERY_UI)
       .thenRun(boot);
   }
+
+  export function boot() : void {
+    console.log('IITCv2 booting…');
+
+    setupMarkerImage();
+    // extractFromStock();
+    // setupIdle();
+    // setupTaphold();
+    // setupStyles();
+    // setupDialogs();
+    // setupDataTileParams();
+    // setupMap();
+    // setupOMS();
+    // search.setup();
+    // setupRedeem();
+    // setupLargeImagePreview();
+    // setupSidebarToggle();
+    // updateGameScore();
+    // artifact.setup();
+    // ornaments.setup();
+    // setupPlayerStat();
+    // setupTooltips();
+    // chat.setup();
+    // portalDetail.setup();
+    // setupQRLoadLib();
+    // setupLayerChooserSelectOne();
+    // setupLayerChooserStatusRecorder();
+
+    console.log('IITCv2 booted.');
+  }
+
+  function setupMarkerImage() {
+    var iconDefImage = '@@INCLUDEIMAGE:image/png:marker-icon.png@@';
+    var iconDefRetImage = '@@INCLUDEIMAGE:image/png:marker-icon-2x.png@@';
+
+    L.Icon.Default = L.Icon.extend({options: {
+      iconUrl: iconDefImage,
+      iconRetinaUrl: iconDefRetImage,
+      iconSize: new L.Point(25, 41),
+      iconAnchor: new L.Point(12, 41),
+      popupAnchor: new L.Point(1, -34),
+    }});
+  }
+
 }
