@@ -71,7 +71,7 @@ iitc_binary(
     deps=[":iitc_lib"],
     assets=ASSETS,
     version=IITC_VERSION,
-    mode="strict",
+    mode="loose",
     base_url="https://experimental.iitc.me/v2/",
 )
 
