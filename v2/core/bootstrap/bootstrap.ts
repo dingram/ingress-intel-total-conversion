@@ -82,7 +82,7 @@ namespace iitc.bootstrap {
 
     setupMarkerImage();
     // extractFromStock();
-    // setupIdle();
+    iitc.idle.setup();
     // setupTaphold();
     // setupStyles();
     // setupDialogs();
