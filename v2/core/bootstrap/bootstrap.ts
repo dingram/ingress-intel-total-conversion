@@ -12,6 +12,8 @@ namespace iitc.bootstrap {
   const JQUERY_UI = `//ajax.googleapis.com/ajax/libs/jqueryui/${JQUERY_UI_VERSION}/jquery-ui.min.js`;
   const LEAFLET = `https://unpkg.com/leaflet@${LEAFLET_VERSION}/dist/leaflet.js`;
 
+  const SIDEBAR_WIDTH = 300;
+
   export function init() : void {
     console.log("Let's get this show on the road!");
     replacePageContent();
@@ -91,7 +93,7 @@ namespace iitc.bootstrap {
     // search.setup();
     // setupRedeem();
     setupLargeImagePreview();
-    // setupSidebarToggle();
+    setupSidebarToggle();
     // updateGameScore();
     // artifact.setup();
     // ornaments.setup();
@@ -121,7 +123,6 @@ namespace iitc.bootstrap {
 
   function setupStyles() {
     const HIDDEN_SCROLLBAR_ASSUMED_WIDTH = 20;
-    const SIDEBAR_WIDTH = 300;
     const CHAT_SHRINKED = 60;
 
     $('head').append('<style>' +
@@ -158,6 +159,25 @@ namespace iitc.bootstrap {
           width: dlgWidth,
         });
       }
+    });
+  }
+
+  function setupSidebarToggle() {
+    $('#sidebartoggle').on('click', function() {
+      var toggle = $('#sidebartoggle');
+      var sidebar = $('#scrollwrapper');
+      if(sidebar.is(':visible')) {
+        sidebar.hide().css('z-index', 1);
+        $('.leaflet-right').css('margin-right','0');
+        toggle.html('<span class="toggle open"></span>');
+        toggle.css('right', '0');
+      } else {
+        sidebar.css('z-index', 1001).show();
+        $('.leaflet-right').css('margin-right', SIDEBAR_WIDTH+1+'px');
+        toggle.html('<span class="toggle close"></span>');
+        toggle.css('right', SIDEBAR_WIDTH+1+'px');
+      }
+      $('.ui-tooltip').remove();
     });
   }
 }
