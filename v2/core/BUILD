@@ -7,7 +7,7 @@ package_group(
 )
 
 
-IITC_VERSION = '0.25.2'
+IITC_VERSION = '1.99.9'
 
 ts_library(
     name="typedecls",
