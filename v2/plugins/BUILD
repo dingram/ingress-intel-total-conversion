@@ -1,5 +1,5 @@
 load("//tools:iitc.bzl", "iitc_js_plugin", "iitc_ts_plugin")
-load(":registry.bzl", "lookup_plugin")
+load(":build_defs/registry.bzl", "lookup_plugin")
 
 
 TS_ROOTNAMES = [f[:-3] for f in glob(["*.ts"], exclude=["*.d.ts"])]
@@ -35,7 +35,7 @@ for f in JS_ROOTNAMES]
 # Index page generator
 sh_binary(
     name="generate_index",
-    srcs=["generate_index.sh"],
+    srcs=["helpers/generate_index.sh"],
 )
 
 filegroup(
