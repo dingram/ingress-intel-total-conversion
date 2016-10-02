@@ -105,6 +105,8 @@ namespace iitc.bootstrap {
     // setupLayerChooserSelectOne();
     // setupLayerChooserStatusRecorder();
 
+    $('#sidebar').show();
+
     console.log('IITCv2 booted.');
   }
 
