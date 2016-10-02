@@ -3,4 +3,7 @@ namespace iitc.ui.dialog {
   var dialogs = {};
   var dialog_count = 0;
   var dialog_focus = null;
+
+  export function show(options: any): void {
+  }
 }

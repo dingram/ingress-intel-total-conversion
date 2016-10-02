@@ -90,7 +90,7 @@ namespace iitc.bootstrap {
     // setupOMS();
     // search.setup();
     // setupRedeem();
-    // setupLargeImagePreview();
+    setupLargeImagePreview();
     // setupSidebarToggle();
     // updateGameScore();
     // artifact.setup();
@@ -137,5 +137,27 @@ namespace iitc.bootstrap {
                        '#scrollwrapper  { width:' + (SIDEBAR_WIDTH + 2 * HIDDEN_SCROLLBAR_ASSUMED_WIDTH) + 'px; right:-' + (2 * HIDDEN_SCROLLBAR_ASSUMED_WIDTH - 2) + 'px } ',
                        '#sidebar > * { width:' + (SIDEBAR_WIDTH + 1) + 'px;  }'].join("\n")
                        + '</style>');
+  }
+
+  function setupLargeImagePreview() {
+    $('#portaldetails').on('click', '.imgpreview', function() {
+      var img: HTMLImageElement = <HTMLImageElement>$(this).find('img')[0];
+      var details = $(this).find('div.portalDetails')[0];
+      // Dialogs have 12px padding around the content.
+      var dlgWidth = Math.max(img.naturalWidth+24,500);
+      if (details) {
+        iitc.ui.dialog.show({
+          html: '<div style="text-align: center">' + img.outerHTML + '</div>' + details.outerHTML,
+          title: $(this).parent().find('h3.title').text(),
+          width: dlgWidth,
+        });
+      } else {
+        iitc.ui.dialog.show({
+          html: '<div style="text-align: center">' + img.outerHTML + '</div>',
+          title: $(this).parent().find('h3.title').text(),
+          width: dlgWidth,
+        });
+      }
+    });
   }
 }
