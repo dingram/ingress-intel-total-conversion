@@ -24,7 +24,7 @@ namespace iitc.bootstrap {
     document.getElementsByTagName('head')[0].innerHTML = ''
       + '<title>Ingress Intel Map</title>'
       + '<style>@@INCLUDESTRING:style.css@@</style>'
-      + '<style>@@INCLUDESTRING:external/leaflet.css@@</style>'
+      + '<style>@@INCLUDESTRING: leaflet.css@@</style>'
       + '<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,400,400italic,500,500italic,700,700italic&subset=latin,cyrillic-ext,greek-ext,greek,vietnamese,latin-ext,cyrillic"/>';
 
 
@@ -52,7 +52,7 @@ namespace iitc.bootstrap {
       + '    <div id="playerstat">t</div>'
       + '    <div id="gamestat">&nbsp;loading global control stats</div>'
       + '    <div id="searchwrapper">'
-      + '      <img src="@@INCLUDEIMAGE:images/current-location.png@@"/ title="Current Location" id="buttongeolocation">'
+      + '      <img src="@@INCLUDEIMAGE:image/png:current-location.png@@" title="Current Location" id="buttongeolocation">'
       + '      <input id="search" placeholder="Search location…" type="search" accesskey="f" title="Search for a place [f]"/>'
       + '    </div>'
       + '    <div id="portaldetails"></div>'

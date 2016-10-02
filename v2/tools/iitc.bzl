@@ -266,19 +266,24 @@ def _add_userscript(ctx, in_artifacts, out_artifacts, metadata=None):
   )
 
 
-def _run_iitc_processor(ctx, in_artifacts, out_artifacts, include=[],
-                        exclude=[]):
+def _run_iitc_processor(ctx, in_artifacts, out_artifacts, include=None,
+                        exclude=None, assets=None):
   args = [
       '--infile', in_artifacts.compiled.path,
       '--outfile', out_artifacts.compiled.path,
   ]
   if include:
-    args += ['--include', ','.join(include)]
+    for f in include:
+      args += ['--include', f]
   if exclude:
-    args += ['--exclude', ','.join(exclude)]
+    for f in exclude:
+      args += ['--exclude', f]
+  if assets:
+    for f in assets:
+      args += ['--asset', f.path]
 
   ctx.action(
-      inputs=[in_artifacts.compiled],
+      inputs=[in_artifacts.compiled] + (assets if assets else []),
       outputs=[out_artifacts.compiled],
       executable=ctx.executable._processor,
       arguments=args,
@@ -380,7 +385,7 @@ def _iitc_plugin(ctx, inputs, out_userjs, out_metajs, srcmap=None):
       srcmap=wrapped_artifacts.srcmap,
   )
   _run_iitc_processor(ctx, wrapped_artifacts, preprocessed_artifacts,
-                      exclude=POSTPROCESS_STEPS)
+                      exclude=POSTPROCESS_STEPS, assets=ctx.files.assets)
 
   # Step 3: Uglify
   # --------------
@@ -414,14 +419,16 @@ def _iitc_plugin(ctx, inputs, out_userjs, out_metajs, srcmap=None):
       srcmap=wrapped_artifacts.srcmap,
   )
   _run_iitc_processor(ctx, struct(compiled=userscript_artifacts.userjs),
-                      postprocessed_userjs_artifacts, include=POSTPROCESS_STEPS)
+                      postprocessed_userjs_artifacts, include=POSTPROCESS_STEPS,
+                      assets=ctx.files.assets)
 
   postprocessed_metajs_artifacts = struct(
       compiled=out_metajs,
       srcmap=wrapped_artifacts.srcmap,
   )
   _run_iitc_processor(ctx, struct(compiled=userscript_artifacts.metajs),
-                      postprocessed_metajs_artifacts, include=POSTPROCESS_STEPS)
+                      postprocessed_metajs_artifacts, include=POSTPROCESS_STEPS,
+                      assets=ctx.files.assets)
 
 
 def _iitc_js_plugin_impl(ctx):
@@ -474,6 +481,7 @@ iitc_js_plugin = rule(
     attrs = {
         'srcs': attr.label_list(allow_files=js_filetype),
         'deps': attr.label_list(allow_files=False),
+        'assets': attr.label_list(allow_files=True),
         'metadata': attr.string_dict(mandatory=True),
         'base_url': attr.string(default=BASE_URL),
         'plugin_deps': attr.string_list(),
@@ -500,6 +508,7 @@ iitc_ts_plugin = rule(
     attrs = {
         'srcs': attr.label_list(allow_files=ts_filetype),
         'deps': attr.label_list(allow_files=False),
+        'assets': attr.label_list(allow_files=True),
         'metadata': attr.string_dict(mandatory=True),
         'base_url': attr.string(default=BASE_URL),
         'plugin_deps': attr.string_list(),
@@ -571,7 +580,7 @@ def _iitc_binary_impl(ctx):
       srcmap=wrapped_artifacts.srcmap,
   )
   _run_iitc_processor(ctx, wrapped_artifacts, preprocessed_artifacts,
-                      exclude=POSTPROCESS_STEPS)
+                      exclude=POSTPROCESS_STEPS, assets=ctx.files.assets)
 
   # Step 5: Uglify
   # --------------
@@ -604,14 +613,16 @@ def _iitc_binary_impl(ctx):
       srcmap=wrapped_artifacts.srcmap,
   )
   _run_iitc_processor(ctx, struct(compiled=userscript_artifacts.userjs),
-                      postprocessed_userjs_artifacts, include=POSTPROCESS_STEPS)
+                      postprocessed_userjs_artifacts, include=POSTPROCESS_STEPS,
+                      assets=ctx.files.assets)
 
   postprocessed_metajs_artifacts = struct(
       compiled=out_metajs,
       srcmap=wrapped_artifacts.srcmap,
   )
   _run_iitc_processor(ctx, struct(compiled=userscript_artifacts.metajs),
-                      postprocessed_metajs_artifacts, include=POSTPROCESS_STEPS)
+                      postprocessed_metajs_artifacts, include=POSTPROCESS_STEPS,
+                      assets=ctx.files.assets)
 
   # Step 8: fix outputs
   # -------------------
@@ -648,6 +659,7 @@ iitc_binary = rule(
     implementation = _iitc_binary_impl,
     attrs = {
         'deps': attr.label_list(allow_files=False),
+        'assets': attr.label_list(allow_files=True),
         'id': attr.string(default='ingress-intel-total-conversion@iitc-me'),
         'title': attr.string(default='IITC: Ingress intel map total conversion'),
         'version': attr.string(mandatory=True),

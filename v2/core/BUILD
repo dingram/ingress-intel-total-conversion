@@ -8,6 +8,10 @@ package_group(
 
 
 IITC_VERSION = '1.99.9'
+ASSETS = [
+    "assets/css/style.css",
+    "assets/images/current-location.png",
+]
 
 ts_library(
     name="typedecls",
@@ -22,20 +26,9 @@ ts_library(
     name="iitc_lib",
     srcs=glob(["**/*.ts"], exclude=["*.d.ts"]),
     deps=[
+        ":typedecls",
         "//third_party/loadjs",
     ],
-)
-
-# Production build
-iitc_binary(
-    name="iitc",
-    deps=[
-        ":iitc_lib",
-        ":typedecls",
-    ],
-    version=IITC_VERSION,
-    mode="strict",
-    visibility=["//:__pkg__"],
 )
 
 ts_library(
@@ -44,13 +37,21 @@ ts_library(
     visibility=["//visibility:public"],
 )
 
+# Production build
+iitc_binary(
+    name="iitc",
+    deps=[":iitc_lib"],
+    assets=ASSETS,
+    version=IITC_VERSION,
+    mode="strict",
+    visibility=["//:__pkg__"],
+)
+
 # Development build: no minfication
 iitc_binary(
     name="iitc.dev",
-    deps=[
-        ":iitc_lib",
-        ":typedecls",
-    ],
+    deps=[":iitc_lib"],
+    assets=ASSETS,
     version=IITC_VERSION,
     mode="dev",
 )
@@ -58,10 +59,8 @@ iitc_binary(
 # Loose build: less strict than production
 iitc_binary(
     name="iitc.loose",
-    deps=[
-        ":iitc_lib",
-        ":typedecls",
-    ],
+    deps=[":iitc_lib"],
+    assets=ASSETS,
     version=IITC_VERSION,
     mode="loose",
 )
@@ -69,10 +68,8 @@ iitc_binary(
 # Experimental build
 iitc_binary(
     name="iitc-exp",
-    deps=[
-        ":iitc_lib",
-        ":typedecls",
-    ],
+    deps=[":iitc_lib"],
+    assets=ASSETS,
     version=IITC_VERSION,
     mode="strict",
     base_url="https://experimental.iitc.me/v2/",
