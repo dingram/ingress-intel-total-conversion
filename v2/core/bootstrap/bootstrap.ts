@@ -84,7 +84,7 @@ namespace iitc.bootstrap {
     // extractFromStock();
     iitc.idle.setup();
     // setupTaphold();
-    // setupStyles();
+    setupStyles();
     // setupDialogs();
     // setupDataTileParams();
     // setupMap();
@@ -120,4 +120,23 @@ namespace iitc.bootstrap {
     }});
   }
 
+  function setupStyles() {
+    const HIDDEN_SCROLLBAR_ASSUMED_WIDTH = 20;
+    const SIDEBAR_WIDTH = 300;
+    const CHAT_SHRINKED = 60;
+
+    $('head').append('<style>' +
+                     [ '#largepreview.enl img { border:2px solid ' + iitc.COLORS[iitc.TEAM_ENL] + '; } ',
+                       '#largepreview.res img { border:2px solid ' + iitc.COLORS[iitc.TEAM_RES] + '; } ',
+                       '#largepreview.none img { border:2px solid ' + iitc.COLORS[iitc.TEAM_NONE] + '; } ',
+                       '#chatcontrols { bottom: ' + (CHAT_SHRINKED + 22) + 'px; }',
+                       '#chat { height: ' + CHAT_SHRINKED + 'px; } ',
+                       '.leaflet-right { margin-right: ' + (SIDEBAR_WIDTH + 1) + 'px } ',
+                       '#updatestatus { width:' + (SIDEBAR_WIDTH + 2) + 'px;  } ',
+                       '#sidebar { width:' + (SIDEBAR_WIDTH + HIDDEN_SCROLLBAR_ASSUMED_WIDTH + 1 /*border*/) + 'px;  } ',
+                       '#sidebartoggle { right:' + (SIDEBAR_WIDTH + 1) + 'px;  } ',
+                       '#scrollwrapper  { width:' + (SIDEBAR_WIDTH + 2 * HIDDEN_SCROLLBAR_ASSUMED_WIDTH) + 'px; right:-' + (2 * HIDDEN_SCROLLBAR_ASSUMED_WIDTH - 2) + 'px } ',
+                       '#sidebar > * { width:' + (SIDEBAR_WIDTH + 1) + 'px;  }'].join("\n")
+                       + '</style>');
+  }
 }
