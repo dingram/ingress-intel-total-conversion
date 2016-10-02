@@ -62,39 +62,39 @@ def _typescript_transpile(ctx, input_files, out_artifacts):
 
 
 def _uglify(ctx, in_artifacts, out_artifacts):
-    flags = [
-        '-c',
-        '-m',
-        '--keep-fnames',
-        '-q 0',
-    ]
-    if hasattr(in_artifacts, 'compiled'):
-      if type(in_artifacts.compiled) == 'list':
-        inputs = in_artifacts.compiled
-      else:
-        inputs = [in_artifacts.compiled]
+  flags = [
+      '-c',
+      '-m',
+      '--keep-fnames',
+      '-q 0',
+  ]
+  if hasattr(in_artifacts, 'compiled'):
+    if type(in_artifacts.compiled) == 'list':
+      inputs = in_artifacts.compiled
     else:
-      inputs = in_artifacts
-    outputs = [out_artifacts.compiled]
-    if out_artifacts.srcmap:
-      if hasattr(in_artifacts, 'srcmap') and in_artifacts.srcmap:
-        flags += ['--in-source-map', in_artifacts.srcmap.path]
-        inputs.append(in_artifacts.srcmap)
+      inputs = [in_artifacts.compiled]
+  else:
+    inputs = in_artifacts
+  outputs = [out_artifacts.compiled]
+  if out_artifacts.srcmap:
+    if hasattr(in_artifacts, 'srcmap') and in_artifacts.srcmap:
+      flags += ['--in-source-map', in_artifacts.srcmap.path]
+      inputs.append(in_artifacts.srcmap)
 
-      #if ctx.attr.source_root:
-      #  flags += ['--source-map-root', ctx.file.source_map.path]
-      flags += ['--source-map', '%s' % out_artifacts.srcmap.path]
-      outputs.append(out_artifacts.srcmap)
+    #if ctx.attr.source_root:
+    #  flags += ['--source-map-root', ctx.file.source_map.path]
+    flags += ['--source-map', '%s' % out_artifacts.srcmap.path]
+    outputs.append(out_artifacts.srcmap)
 
-    flags += ['-o', '%s' % out_artifacts.compiled.path]
+  flags += ['-o', '%s' % out_artifacts.compiled.path]
 
-    ctx.action(
-        inputs=inputs,
-        outputs=outputs,
-        command='uglifyjs %s %s' % (' '.join(flags),
-                                    cmd_helper.join_paths(' ', set(inputs))),
-        progress_message=('Uglifying %s' % out_artifacts.compiled.path),
-    )
+  ctx.action(
+      inputs=inputs,
+      outputs=outputs,
+      command='uglifyjs %s %s' % (' '.join(flags),
+                                  cmd_helper.join_paths(' ', set(inputs))),
+      progress_message=('Uglifying %s' % out_artifacts.compiled.path),
+  )
 
 
 def _generate_userscript_block(id=None, title=None, category=None,
