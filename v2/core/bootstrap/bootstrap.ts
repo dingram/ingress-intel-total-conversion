@@ -97,7 +97,7 @@ namespace iitc.bootstrap {
     // updateGameScore();
     // artifact.setup();
     // ornaments.setup();
-    // setupPlayerStat();
+    setupPlayerStat();
     // setupTooltips();
     // chat.setup();
     // portalDetail.setup();
@@ -179,5 +179,48 @@ namespace iitc.bootstrap {
       }
       $('.ui-tooltip').remove();
     });
+  }
+
+  function setupPlayerStat() {
+    // stock site updated to supply the actual player level, AP requirements and XM capacity values
+    var level = PLAYER.verified_level;
+    PLAYER.level = level; //for historical reasons IITC expects PLAYER.level to contain the current player level
+
+    var n = PLAYER.nickname;
+    PLAYER.nickMatcher = new RegExp('\\b('+n+')\\b', 'ig');
+
+    var ap = parseInt(PLAYER.ap);
+    var thisLvlAp = parseInt(PLAYER.min_ap_for_current_level);
+    var nextLvlAp = parseInt(PLAYER.min_ap_for_next_level);
+
+    // If zero nextLvlAp, player at maximum level(?)
+    var lvlUpAp = nextLvlAp ? iitc.util.digits(nextLvlAp-ap) : 0;
+    var lvlApProg = nextLvlAp ? Math.round((ap-thisLvlAp)/(nextLvlAp-thisLvlAp)*100) : 0;
+
+    var xmMax = parseInt(PLAYER.xm_capacity);
+    var xmRatio = Math.round(PLAYER.energy/xmMax*100);
+
+    var cls = PLAYER.team === 'RESISTANCE' ? 'res' : 'enl';
+
+
+    var t = 'Level:\t' + level + '\n'
+    + 'XM:\t' + PLAYER.energy + ' / ' + xmMax + '\n'
+    + 'AP:\t' + iitc.util.digits(ap) + '\n'
+    + (nextLvlAp > 0 ? 'level up in:\t' + lvlUpAp + ' AP' : 'Maximal level reached(!)')
+    + '\n\Invites:\t'+PLAYER.available_invites
+    + '\n\nNote: your player stats can only be updated by a full reload (F5)';
+
+    $('#playerstat').html(''
+                          + '<h2 title="'+t+'">'+level+'&nbsp;'
+                          + '<div id="name">'
+                          + '<span class="'+cls+'">'+PLAYER.nickname+'</span>'
+                          + '<a href="/_ah/logout?continue=https://www.google.com/accounts/Logout%3Fcontinue%3Dhttps://appengine.google.com/_ah/logout%253Fcontinue%253Dhttps://www.ingress.com/intel%26service%3Dah" id="signout">sign out</a>'
+                          + '</div>'
+                          + '<div id="stats">'
+                          + '<sup>XM: '+xmRatio+'%</sup>'
+                          + '<sub>' + (nextLvlAp > 0 ? 'level: '+lvlApProg+'%' : 'max level') + '</sub>'
+                          + '</div>'
+                          + '</h2>'
+                         );
   }
 }
