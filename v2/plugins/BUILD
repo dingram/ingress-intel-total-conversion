@@ -13,7 +13,7 @@ ALL_ROOTNAMES = TS_ROOTNAMES + JS_ROOTNAMES
         srcs=["%s.ts" % f],
         deps=[
             "//core:typedecls",
-            "//core:iitc_typedecl",
+            "//core:iitc-exp_typedecl" if m == "exp" else "//core:iitc_typedecl",
         ],
         metadata=lookup_plugin(f),
         mode="strict" if m == "exp" else m,

@@ -77,6 +77,12 @@ iitc_binary(
     base_url="https://experimental.iitc.me/v2/",
 )
 
+ts_library(
+    name="iitc-exp_typedecl",
+    srcs=[":iitc-exp.d.ts"],
+    visibility=["//visibility:public"],
+)
+
 # Upload experimental build
 genrule(
     name="upload-exp",
