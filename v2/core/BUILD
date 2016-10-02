@@ -35,6 +35,7 @@ iitc_binary(
     ],
     version=IITC_VERSION,
     mode="strict",
+    visibility=["//:__pkg__"],
 )
 
 ts_library(

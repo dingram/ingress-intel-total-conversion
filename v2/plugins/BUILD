@@ -38,6 +38,12 @@ sh_binary(
     srcs=["generate_index.sh"],
 )
 
+filegroup(
+    name="all_plugins",
+    srcs=[":%s" % f for f in (JS_ROOTNAMES + TS_ROOTNAMES)],
+    visibility=["//:__pkg__"],
+)
+
 genrule(
     name="plugin-index",
     outs=["index.html"],
