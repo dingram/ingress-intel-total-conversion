@@ -1,1 +1,8 @@
 workspace(name="me_iitc")
+
+new_git_repository(
+    name="loadjs",
+    remote="https://github.com/node-js-libs/load.js.git",
+    commit="3acd55abe69660685da71ff5fd463af2bc8a4387",
+    build_file="buildfiles/BUILD.loadjs",
+)

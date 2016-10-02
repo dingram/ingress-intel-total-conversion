@@ -1,1 +1,0 @@
-var helpers_sample = 'helpers/sample.js executed'

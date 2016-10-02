@@ -27,7 +27,7 @@ ts_library(
     srcs=glob(["**/*.ts"], exclude=["*.d.ts"]),
     deps=[
         ":typedecls",
-        "//third_party/loadjs",
+        "@loadjs//:loadjs",
     ],
 )
 
