@@ -5,6 +5,9 @@ py_binary(
 )
 
 exports_files(
-    ["plugin_wrapper.js"],
+    [
+        "core_wrapper.js",
+        "plugin_wrapper.js",
+    ],
     visibility=["//visibility:public"],
 )

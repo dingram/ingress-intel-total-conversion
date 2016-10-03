@@ -5,7 +5,7 @@ function wrapper(plugin_info) {
 if (typeof window.iitc_plugins === 'undefined') window.iitc_plugins = [];
 
 var setup = function() {
-'@@PLUGIN_CODE@@';
+'@@WRAPPED_CODE@@';
 };
 
 var deps = '@@PLUGIN_DEPS@@';

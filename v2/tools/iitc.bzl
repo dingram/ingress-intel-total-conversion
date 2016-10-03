@@ -137,85 +137,51 @@ def _generate_userscript_block(id=None, title=None, category=None,
   return '\n'.join(meta_lines)
 
 
-def _add_inject_wrapper(ctx, in_artifacts, out_artifacts):
-  inject_pre = _intermediate_file(ctx, "inject_pre.js")
-  inject_post = _intermediate_file(ctx, "inject_post.js")
+def _add_wrapper(ctx, wrapper_file, in_artifacts, out_artifacts,
+                 extra_replacements=None):
+  wrapper_pre = _intermediate_file(ctx, "wrapper_pre.js")
+  wrapper_post = _intermediate_file(ctx, "wrapper_post.js")
 
   ctx.action(
-      inputs=[ctx.file._inject_wrapper],
-      outputs=[inject_pre],
-      command=('sed -ne "1,/^\'@@INJECTCODE@@\';\$/'
-               + '{ /^\'@@INJECTCODE@@\';\$/d; p; }" %s > %s' % (
-                   ctx.file._inject_wrapper.path,
-                   inject_pre.path,
+      inputs=[wrapper_file],
+      outputs=[wrapper_pre],
+      command=('sed -ne "1,/^\'@@WRAPPED_CODE@@\';\$/'
+               + '{ /^\'@@WRAPPED_CODE@@\';\$/d; p; }" %s > %s' % (
+                   wrapper_file.path,
+                   wrapper_pre.path,
                    )),
-      progress_message=('Preparing inject wrapper for %s' %
+      progress_message=('Preparing wrapper for %s' %
                         out_artifacts.compiled.path),
   )
 
   ctx.action(
-      inputs=[ctx.file._inject_wrapper],
-      outputs=[inject_post],
-      command=('sed -ne "/^\'@@INJECTCODE@@\';\$/,\$'
-               + '{ s/^\'@@INJECTCODE@@\';\$//; p; }" %s > %s' % (
-                   ctx.file._inject_wrapper.path,
-                   inject_post.path,
+      inputs=[wrapper_file],
+      outputs=[wrapper_post],
+      command=('sed -ne "/^\'@@WRAPPED_CODE@@\';\$/,\$'
+               + '{ s/^\'@@WRAPPED_CODE@@\';\$//; p; }" %s > %s' % (
+                   wrapper_file.path,
+                   wrapper_post.path,
                    )),
-      progress_message=('Preparing inject wrapper for %s' %
+      progress_message=('Preparing wrapper for %s' %
                         out_artifacts.compiled.path),
   )
 
-  ctx.action(
-      inputs=[inject_pre, in_artifacts.compiled, inject_post],
-      outputs=[out_artifacts.compiled],
-      command='cat %s %s %s > %s' % (inject_pre.path,
-                                     in_artifacts.compiled.path,
-                                     inject_post.path,
-                                     out_artifacts.compiled.path),
-      progress_message=('Preparing inject wrapper for %s' %
-                        out_artifacts.compiled.path),
-  )
-
-
-def _add_plugin_wrapper(ctx, in_artifacts, out_artifacts, plugin_deps):
-  plugin_pre = _intermediate_file(ctx, "plugin_pre.js")
-  plugin_post = _intermediate_file(ctx, "plugin_post.js")
-
-  ctx.action(
-      inputs=[ctx.file._plugin_wrapper],
-      outputs=[plugin_pre],
-      command=('sed -ne "1,/^\'@@PLUGIN_CODE@@\';\$/'
-               + '{ /^\'@@PLUGIN_CODE@@\';\$/d; p; }" %s > %s' % (
-                   ctx.file._plugin_wrapper.path,
-                   plugin_pre.path,
-                   )),
-      progress_message=('Preparing plugin wrapper for %s' %
-                        out_artifacts.compiled.path),
-  )
-
-  ctx.action(
-      inputs=[ctx.file._plugin_wrapper],
-      outputs=[plugin_post],
-      command=('sed -ne "/^\'@@PLUGIN_CODE@@\';\$/,\$'
-               + '{ s/^\'@@PLUGIN_CODE@@\';\$//; p; }" %s > %s' % (
-                   ctx.file._plugin_wrapper.path,
-                   plugin_post.path,
-                   )),
-      progress_message=('Preparing plugin wrapper for %s' %
-                        out_artifacts.compiled.path),
-  )
+  if extra_replacements:
+    plugin_deps = extra_replacements.get('@@PLUGIN_DEPS@@', '')
+  else:
+    plugin_deps = ''
 
   if hasattr(in_artifacts, 'compiled'):
     input = in_artifacts.compiled
   else:
     input = in_artifacts
   ctx.action(
-      inputs=[plugin_pre, input, plugin_post],
+      inputs=[wrapper_pre, input, wrapper_post],
       outputs=[out_artifacts.compiled],
       command='cat %s %s %s | sed -re "s/@@PLUGIN_DEPS@@/%s/" > %s' % (
-          plugin_pre.path, input.path, plugin_post.path,
-          ','.join(plugin_deps), out_artifacts.compiled.path),
-      progress_message=('Preparing plugin wrapper for %s' %
+          wrapper_pre.path, input.path, wrapper_post.path,
+          plugin_deps, out_artifacts.compiled.path),
+      progress_message=('Preparing wrapper for %s' %
                         out_artifacts.compiled.path),
   )
 
@@ -375,8 +341,10 @@ def _iitc_plugin(ctx, inputs, out_userjs, out_metajs, srcmap=None):
       compiled=_intermediate_file(ctx, "wrapped.js"),
       srcmap=inputs.srcmap if hasattr(inputs, 'srcmap') else None,
   )
-  _add_plugin_wrapper(ctx, inputs, wrapped_artifacts,
-                      ctx.attr.plugin_deps)
+  _add_wrapper(ctx, ctx.file.wrapper, inputs, wrapped_artifacts,
+               extra_replacements={
+                   '@@PLUGIN_DEPS@@': ','.join(ctx.attr.plugin_deps),
+               })
 
   # Step 2: Preprocess
   # ------------------
@@ -486,12 +454,12 @@ iitc_js_plugin = rule(
         'base_url': attr.string(default=BASE_URL),
         'plugin_deps': attr.string_list(),
         'mode': attr.string(values=['loose', 'strict', 'dev'], default='loose'),
-
-        '_plugin_wrapper': attr.label(
+        'wrapper': attr.label(
             default=Label('//tools:plugin_wrapper.js'),
             allow_single_file=True,
             executable=False,
         ),
+
         '_processor': attr.label(
             default=Label('//tools:iitc_processor'),
             executable=True,
@@ -513,12 +481,12 @@ iitc_ts_plugin = rule(
         'base_url': attr.string(default=BASE_URL),
         'plugin_deps': attr.string_list(),
         'mode': attr.string(values=['loose', 'strict', 'dev'], default='loose'),
-
-        '_plugin_wrapper': attr.label(
+        'wrapper': attr.label(
             default=Label('//tools:plugin_wrapper.js'),
             allow_single_file=True,
             executable=False,
         ),
+
         '_processor': attr.label(
             default=Label('//tools:iitc_processor'),
             executable=True,
@@ -571,7 +539,7 @@ def _iitc_binary_impl(ctx):
       compiled=_intermediate_file(ctx, "wrapped.js"),
       srcmap=ts_artifacts.srcmap,
   )
-  _add_inject_wrapper(ctx, combined_artifacts, wrapped_artifacts)
+  _add_wrapper(ctx, ctx.file.wrapper, combined_artifacts, wrapped_artifacts)
 
   # Step 4: Preprocess
   # ------------------
@@ -667,12 +635,12 @@ iitc_binary = rule(
         'base_url': attr.string(default=BASE_URL),
         'generate_source_map': attr.bool(),
         'mode': attr.string(values=['loose', 'strict', 'dev'], default='loose'),
-
-        '_inject_wrapper': attr.label(
-            default=Label('//core:inject_wrapper.js'),
+        'wrapper': attr.label(
+            default=Label('//tools:core_wrapper.js'),
             allow_single_file=True,
             executable=False,
         ),
+
         '_processor': attr.label(
             default=Label('//tools:iitc_processor'),
             executable=True,

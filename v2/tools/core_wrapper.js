@@ -30,7 +30,7 @@ if (typeof(window.PLAYER)!="object" || typeof(window.PLAYER.nickname) != "string
 function wrapper(info) {
 // START OF WRAPPER
 
-'@@INJECTCODE@@';
+'@@WRAPPED_CODE@@';
 
 // Let's get this show on the road.
 (window.iitc = iitc).bootstrap.init();
