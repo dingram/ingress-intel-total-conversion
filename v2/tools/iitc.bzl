@@ -2,7 +2,11 @@ load("//tools:typescript.bzl", "ts_binary", "ts_library")
 load("//tools:uglify_js.bzl", "uglify_js")
 load("//tools:userjs.bzl", "userscript_binary")
 
-BASE_URL = 'https://iitc.me/stable/'
+DOWNLOAD_URLS = {
+  'release': 'https://static.iitc.me/build/release/',
+  'test': 'https://static.iitc.me/build/test/',
+  'exp': 'https://experimental.iitc.me/v2/',
+}
 
 
 js_filetype = FileType(['.js'])
@@ -205,8 +209,6 @@ def _add_userscript(ctx, in_artifacts, out_artifacts, metadata=None):
                      else None),
     }
 
-  if 'base_url' not in metadata:
-    metadata['base_url'] = BASE_URL
   if 'rootname' not in metadata:
     metadata['rootname'] = ctx.label.name
 
@@ -451,7 +453,7 @@ iitc_js_plugin = rule(
         'deps': attr.label_list(allow_files=False),
         'assets': attr.label_list(allow_files=True),
         'metadata': attr.string_dict(mandatory=True),
-        'base_url': attr.string(default=BASE_URL),
+        'base_url': attr.string(default=DOWNLOAD_URLS['release']),
         'plugin_deps': attr.string_list(),
         'mode': attr.string(values=['loose', 'strict', 'dev'], default='loose'),
         'wrapper': attr.label(
@@ -478,7 +480,7 @@ iitc_ts_plugin = rule(
         'deps': attr.label_list(allow_files=False),
         'assets': attr.label_list(allow_files=True),
         'metadata': attr.string_dict(mandatory=True),
-        'base_url': attr.string(default=BASE_URL),
+        'base_url': attr.string(default=DOWNLOAD_URLS['release']),
         'plugin_deps': attr.string_list(),
         'mode': attr.string(values=['loose', 'strict', 'dev'], default='loose'),
         'wrapper': attr.label(
@@ -632,7 +634,7 @@ iitc_binary = rule(
         'title': attr.string(default='IITC: Ingress intel map total conversion'),
         'version': attr.string(mandatory=True),
         'description': attr.string(default='Total conversion for the Ingress intel map.'),
-        'base_url': attr.string(default=BASE_URL),
+        'base_url': attr.string(default=DOWNLOAD_URLS['release']),
         'generate_source_map': attr.bool(),
         'mode': attr.string(values=['loose', 'strict', 'dev'], default='loose'),
         'wrapper': attr.label(
