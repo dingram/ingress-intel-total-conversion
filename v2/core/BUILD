@@ -1,5 +1,5 @@
 load("//tools:typescript.bzl", "ts_library")
-load("//tools:iitc.bzl", "iitc_binary")
+load("//tools:iitc.bzl", "iitc_binary", "DOWNLOAD_URLS")
 
 package_group(
     name="visibility",
@@ -74,7 +74,8 @@ iitc_binary(
     assets=ASSETS,
     version=IITC_VERSION,
     mode="loose",
-    base_url="https://experimental.iitc.me/v2/",
+    base_url=DOWNLOAD_URLS['exp'],
+    visibility=["//:__pkg__"],
 )
 
 ts_library(
