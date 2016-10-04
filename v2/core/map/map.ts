@@ -1,6 +1,13 @@
+/**
+ * The IITC map and renderer.
+ */
 namespace iitc.map {
+  /** The map object itself. */
   export var map: L.Map;
 
+  /**
+   * Set up the map.
+   */
   export function setup() {
     $('#map').text('');
 

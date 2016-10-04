@@ -1,10 +1,20 @@
+/**
+ * The main IITC namespace.
+ */
 namespace iitc {
+  /** The (UTC) date on which this build of IITC was built. */
   export const buildDate = '@@BUILDDATE@@';
 }
 
+/**
+ * The IITC bootstrapper.
+ */
 namespace iitc.bootstrap {
+  /** The version of jQuery that we use. */
   const JQUERY_VERSION = '2.1.3';
+  /** The version of jQuery UI that we use. */
   const JQUERY_UI_VERSION = '1.11.3';
+  /** The version of Leaflet that we use. */
   const LEAFLET_VERSION = '0.7.4';
 
   // NOTE: no protocol - uses http or https as used on the current page
@@ -12,14 +22,22 @@ namespace iitc.bootstrap {
   const JQUERY_UI = `//ajax.googleapis.com/ajax/libs/jqueryui/${JQUERY_UI_VERSION}/jquery-ui.min.js`;
   const LEAFLET = `https://unpkg.com/leaflet@${LEAFLET_VERSION}/dist/leaflet.js`;
 
+  /** The width of the sidebar on the right of the page, in pixels. */
   const SIDEBAR_WIDTH = 300;
 
+  /**
+   * Initialize the bootstrapping process by replacing the old page and loading
+   * our external dependencies.
+   */
   export function init() : void {
     console.log("Let's get this show on the road!");
     replacePageContent();
     loadExternalScripts();
   }
 
+  /**
+   * Rewrite the host page to our own content.
+   */
   function replacePageContent() : void {
     // Remove complete page. We only wanted the user-data and the page's
     // security context so we can access the API easily. Setup as much as
@@ -72,6 +90,9 @@ namespace iitc.bootstrap {
       + '<div id="play_button"></div>';
   }
 
+  /**
+   * Start loading our external dependencies, then continue booting.
+   */
   function loadExternalScripts() : void {
     load(JQUERY)
       .then(LEAFLET)
@@ -79,6 +100,9 @@ namespace iitc.bootstrap {
       .thenRun(boot);
   }
 
+  /**
+   * Initialize every other part of IITC.
+   */
   export function boot() : void {
     console.log('IITCv2 booting…');
 
@@ -114,6 +138,9 @@ namespace iitc.bootstrap {
     console.log('IITCv2 booted.');
   }
 
+  /**
+   * Configure the default marker used by Leaflet.
+   */
   function setupMarkerImage() {
     var iconDefImage = '@@INCLUDEIMAGE:image/png:marker-icon.png@@';
     var iconDefRetImage = '@@INCLUDEIMAGE:image/png:marker-icon-2x.png@@';
@@ -127,6 +154,9 @@ namespace iitc.bootstrap {
     }});
   }
 
+  /**
+   * Add a few styles that need some calculation.
+   */
   function setupStyles() {
     const HIDDEN_SCROLLBAR_ASSUMED_WIDTH = 20;
     const CHAT_SHRINKED = 60;
@@ -146,8 +176,11 @@ namespace iitc.bootstrap {
                        + '</style>');
   }
 
+  /**
+   * Set up the large portal image preview dialog.
+   */
   function setupLargeImagePreview() {
-    $('#portaldetails').on('click', '.imgpreview', function() {
+    $('#portaldetails').on('click', '.imgpreview', function(this: HTMLImageElement) {
       var img: HTMLImageElement = <HTMLImageElement>$(this).find('img')[0];
       var details = $(this).find('div.portalDetails')[0];
       // Dialogs have 12px padding around the content.
@@ -168,6 +201,9 @@ namespace iitc.bootstrap {
     });
   }
 
+  /**
+   * Set up the sidebar show/hide toggle.
+   */
   function setupSidebarToggle() {
     $('#sidebartoggle').on('click', function() {
       var toggle = $('#sidebartoggle');
@@ -187,6 +223,9 @@ namespace iitc.bootstrap {
     });
   }
 
+  /**
+   * Set up the player status display.
+   */
   function setupPlayerStat() {
     // stock site updated to supply the actual player level, AP requirements and XM capacity values
     var level = PLAYER.verified_level;
