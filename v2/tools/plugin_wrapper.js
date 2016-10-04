@@ -4,7 +4,7 @@ function wrapper(plugin_info) {
 // Ensure plugin list is there, even if IITC is not yet loaded.
 if (typeof window.iitc_plugins === 'undefined') window.iitc_plugins = [];
 
-var setup = function() {
+var setup = function(plugin) {
 '@@WRAPPED_CODE@@';
 };
 

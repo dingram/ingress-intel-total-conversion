@@ -107,6 +107,10 @@ namespace iitc.bootstrap {
 
     $('#sidebar').show();
 
+    iitc.plugins.setup();
+    // setMapBaseLayer();
+    // setupLayerChooserApi();
+
     console.log('IITCv2 booted.');
   }
 
