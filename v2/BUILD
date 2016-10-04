@@ -15,8 +15,8 @@ filegroup(
 )
 
 filegroup(
-    name="dist-exp",
-    srcs=["//core:iitc-exp", "//plugins:all_plugins-exp"],
+    name="dist.exp",
+    srcs=["//core:iitc.exp", "//plugins:all_plugins.exp"],
 )
 
 # Bundle files for distribution
@@ -35,15 +35,15 @@ genrule(
 )
 
 genrule(
-    name="dist_tarball-exp",
-    srcs=[":dist-exp"],
-    outs=["iitc-dist-exp.tar.xz"],
+    name="dist_tarball.exp",
+    srcs=[":dist.exp"],
+    outs=["iitc-dist.exp.tar.xz"],
     cmd='tar -cJvf $@ --transform="s,^.*/bin/,," --transform="s,^core/,," $(SRCS)',
 )
 
 genrule(
-    name="dist_zip-exp",
-    srcs=[":dist-exp"],
-    outs=["iitc-dist-exp.zip"],
+    name="dist_zip.exp",
+    srcs=[":dist.exp"],
+    outs=["iitc-dist.exp.zip"],
     cmd='zip -j9 $@ $(SRCS)',
 )
