@@ -63,8 +63,6 @@ namespace iitc.plugins {
     }
   }
 
-  var _pluginManager = null;
-
   export function setup() {
     // TODO: cope with legacy plugins in bootPlugins
     let plugin_list: IITCPlugin[] = [];
