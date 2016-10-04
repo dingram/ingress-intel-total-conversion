@@ -1,4 +1,6 @@
 namespace iitc.plugins {
+  var _plugin: any = {};
+
   export class PluginManager {
     private _initialized = false;
 
@@ -25,7 +27,22 @@ namespace iitc.plugins {
     public init() {
       // initialize plugins
       if (!window.plugin) {
-        window.plugin = {};
+        Object.defineProperty(window, "plugin", {
+            get: function () {
+              return _plugin;
+            },
+            set: function (v: any) {
+              if (typeof v == 'function') {
+                for (let k in v) {
+                  throw new Error('Disallowing attempt to set window.plugin to a function object with properties');
+                }
+                return;
+              }
+              throw new Error('Disallowing attempt to set window.plugin');
+            },
+            enumerable: true,
+            configurable: false,
+        });
       }
       if (this._initialized) {
         throw new Error('PluginManager is already initialized');
