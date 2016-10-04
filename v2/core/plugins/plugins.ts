@@ -2,7 +2,10 @@
  * The IITC plugin management subsystem.
  */
 namespace iitc.plugins {
-  /** The holder for window.plugin, used to keep it protected against accidental clearing. */
+  /**
+   * The holder for window.plugin, used to keep it protected against accidental
+   * clearing.
+   */
   var _plugin: any = {};
 
   /**
@@ -35,7 +38,8 @@ namespace iitc.plugins {
      * @param plugin The plugin to fetch the display name for.
      */
     private pluginDisplayName(plugin: IITCPlugin) {
-      if (plugin && plugin.info && plugin.info.script && plugin.info.script.name) {
+      if (plugin && plugin.info && plugin.info.script &&
+          plugin.info.script.name) {
         return plugin.info.script.name;
       }
       return '[unknown]';
@@ -50,14 +54,23 @@ namespace iitc.plugins {
       let plugin_name: string = this.pluginDisplayName(plugin);
       try {
         if (plugin.legacy) {
-          console.warn('PluginManager: Initializing legacy plugin "' + plugin_name + '"');
+          if ((iitc as any).compat) {
+            console.log('PluginManager: Initializing legacy plugin "'
+                        + plugin_name + '"');
+          } else {
+            console.warn('PluginManager: Initializing legacy plugin "'
+                         + plugin_name + '" WITHOUT compatibility layer!\n'
+                         + 'WARNING: This plugin may not work at all!');
+          }
           plugin();
         } else {
-          console.log('PluginManager: Initializing plugin "' + plugin_name + '"');
+          console.log('PluginManager: Initializing plugin "'
+                      + plugin_name + '"');
           plugin(window.plugin);
         }
       } catch (e) {
-        console.error('Failed to initialize plugin "' + plugin_name + '": ' + e);
+        console.error('Failed to initialize plugin "' + plugin_name + '": '
+                      + e);
       }
     }
 
@@ -68,7 +81,7 @@ namespace iitc.plugins {
      * As a side-effect, we replace window.plugin with an unoverwritable
      * object, so that badly-written plugins can't clobber it with code like:
      *
-     *     if (typeof window.plugin !== 'function') window.plugin = function(){};
+     *   if (typeof window.plugin !== 'function') window.plugin = function(){};
      *
      * This is because there is absolutely no reason for it to need to be a
      * function and suffer the extra (slight) overhead.
@@ -92,7 +105,8 @@ namespace iitc.plugins {
             if (typeof v == 'function') {
               for (let k in v) {
                 k;
-                throw new Error('Disallowing attempt to set window.plugin to a function object with properties');
+                throw new Error('Disallowing attempt to set window.plugin to '
+                                + 'a function object with properties');
               }
               return;
             }
@@ -165,14 +179,6 @@ namespace iitc.plugins {
     /**
      * Set up the plugin environment, then actually load and initialize any
      * pending plugins.
-     *
-     * As a side-effect, we replace window.plugin with an unoverwritable
-     * object, so that badly-written plugins can't clobber it with code like:
-     *
-     *     if (typeof window.plugin !== 'function') window.plugin = function(){};
-     *
-     * This is because there is absolutely no reason for it to need to be a
-     * function and suffer the extra (slight) overhead.
      */
     public init(): void {
       if (this._initialized) {
