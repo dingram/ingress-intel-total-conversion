@@ -58,6 +58,12 @@ iitc_binary(
     mode="dev",
 )
 
+ts_library(
+    name="iitc.dev_typedecl",
+    srcs=[":iitc.dev.d.ts"],
+    visibility=["//visibility:public"],
+)
+
 # Loose build: less strict than production
 iitc_binary(
     name="iitc.loose",
@@ -69,7 +75,7 @@ iitc_binary(
 
 # Experimental build
 iitc_binary(
-    name="iitc-exp",
+    name="iitc.exp",
     deps=[":iitc_lib"],
     assets=ASSETS,
     version=IITC_VERSION,
@@ -79,8 +85,8 @@ iitc_binary(
 )
 
 ts_library(
-    name="iitc-exp_typedecl",
-    srcs=[":iitc-exp.d.ts"],
+    name="iitc.exp_typedecl",
+    srcs=[":iitc.exp.d.ts"],
     visibility=["//visibility:public"],
 )
 
@@ -88,7 +94,7 @@ ts_library(
 genrule(
     name="upload-exp",
     outs=["upload-exp.sh"],
-    srcs=[":iitc-exp"],
+    srcs=[":iitc.exp"],
     cmd='echo "#!/bin/bash\nset +x\ngsutil -m -h Cache-Control:private,\\ max-age=0,\\ no-transform cp -z js,ts -a public-read $(SRCS) gs://experimental.iitc.me/v2/" > $@',
     executable=1,
     output_to_bindir=1,

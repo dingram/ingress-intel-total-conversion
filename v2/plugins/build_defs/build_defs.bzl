@@ -25,10 +25,11 @@ def GeneratePluginTargets(flavors):
   all_rootnames = source_files.js_rootnames + source_files.ts_rootnames
 
   for flavor in flavors:
+    name_suffix = _NAME_SUFFIX.get(flavor, ".%s" % flavor)
     # Pure JavaScript plugins
     for f in source_files.js_rootnames:
       iitc_js_plugin(
-          name=f + _NAME_SUFFIX.get(flavor, ".%s" % flavor),
+          name=f + name_suffix,
           srcs=["%s.js" % f],
           metadata=lookup_plugin(f),
           mode=_FLAVOR_TO_MODE[flavor],
@@ -38,11 +39,11 @@ def GeneratePluginTargets(flavors):
     # TypeScript plugins
     for f in source_files.ts_rootnames:
       iitc_ts_plugin(
-          name=f + _NAME_SUFFIX.get(flavor, ".%s" % flavor),
+          name=f + name_suffix,
           srcs=["%s.ts" % f],
           deps=[
               "//core:typedecls",
-              "//core:iitc-exp_typedecl" if flavor == "exp" else "//core:iitc_typedecl",
+              "//core:iitc%s_typedecl" % name_suffix,
           ],
           metadata=lookup_plugin(f),
           mode=_FLAVOR_TO_MODE[flavor],
@@ -51,7 +52,7 @@ def GeneratePluginTargets(flavors):
 
     # Group the resulting files together
     native.filegroup(
-        name="all_plugins" + _NAME_SUFFIX.get(flavor, "-%s" % flavor),
-        srcs=[":%s%s" % (f, _NAME_SUFFIX.get(flavor, ".%s" % flavor)) for f in all_rootnames],
+        name="all_plugins" + name_suffix,
+        srcs=[":%s%s" % (f, name_suffix) for f in all_rootnames],
         visibility=["//:__pkg__"],
     )
