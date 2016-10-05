@@ -49,7 +49,7 @@ namespace iitc.ui.dialog {
   function initialize(options: DialogOptions): ImmutableDialogOptions {
     // all optional properties must have a default
     let defaults: DialogOptions = {
-      class: 'ui-dialog-modal',
+      class: '',
       draggable: true,
       id: '',
       html: '',
@@ -70,6 +70,15 @@ namespace iitc.ui.dialog {
       }
       else
         options.html = iitc.util.convertTextToTableMagic(options.text);
+    }
+
+    // modal dialogs should not be draggable
+    if (options.modal) {
+      if (typeof options.class == 'undefined') {
+        options.class = '';
+      }
+      options.class = (options.class ? options.class + ' ' : '') + 'ui-dialog-modal';
+      options.draggable = false;
     }
 
     // merge defaults and provided options
