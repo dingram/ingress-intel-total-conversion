@@ -3,17 +3,78 @@
  */
 namespace iitc.ui.dialog {
   /** Latest dialog ID? */
-  var dialog_id = 0;
+  let dialog_id: number = 0;
   /** All dialogs currently open? */
-  var dialogs = {};
+  let dialogs: Array<string> = [];
   /** Count of dialogs currently open? */
-  var dialog_count = 0;
+  let dialog_count: number = 0;
   /** The dialog with focus? */
-  var dialog_focus = null;
+  //let dialog_focus: number = 0;
 
   /**
    * Show a dialog with the given options.
    */
-  export function show(options: any): void {
+  export function show(options: DialogOptions): void {
+    let opts: ImmutableDialogOptions = initialize(options);
+    dialogs.push(opts.id);
+    dialog_count++;
+  }
+
+  export function close(): void {
+    dialog_count--;
+  }
+
+  export interface DialogOptions {
+    class?: string;
+    draggable?: boolean;
+    id?: string;
+    html?: string;
+    modal?: boolean;
+    text?: string;
+    title: string;
+    width?: number;
+  }
+
+  interface ImmutableDialogOptions extends DialogOptions {
+    readonly class: string;
+    readonly draggable: boolean;
+    readonly id: string;
+    readonly html: string;
+    readonly modal: boolean;
+    readonly text: string;
+    readonly title: string;
+    readonly width: number;
+  }
+
+  function initialize(options: DialogOptions): ImmutableDialogOptions {
+    // all optional properties must have a default
+    let defaults: DialogOptions = {
+      class: 'ui-dialog-modal',
+      draggable: true,
+      id: '',
+      html: '',
+      modal: /*iitc.isMobile*/ false,
+      text: '',
+      title: '',
+      width: 500
+    }
+
+    // hijack id
+    options.id = 'dialog-' + (options.modal ? 'modal' : (options.id ? options.id : 'anon-' + dialog_id++));
+
+    // ensure either html or text is provided
+    if (typeof options.html === 'undefined') {
+      if (typeof options.text === 'undefined') {
+        console.error('iitc.ui.dialog.show: no text in dialog ' + options.id);
+        options.html = iitc.util.convertTextToTableMagic('');
+      }
+      else
+        options.html = iitc.util.convertTextToTableMagic(options.text);
+    }
+
+    // merge defaults and provided options
+    let opts: ImmutableDialogOptions = $.extend({}, defaults, options);
+
+    return opts;
   }
 }
