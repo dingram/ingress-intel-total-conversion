@@ -4,6 +4,12 @@ py_binary(
     visibility=["//visibility:public"],
 )
 
+py_binary(
+    name="make_userscript",
+    srcs=["make_userscript.py"],
+    visibility=["//visibility:public"],
+)
+
 exports_files(
     [
         "core_wrapper.js",
