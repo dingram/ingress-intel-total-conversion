@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import argparse
 import base64
 import io
@@ -73,6 +74,9 @@ class Transformer(object):
         contents = transformed
 
     return contents
+
+  def transform_buildname(self, contents):
+    return contents.replace('@@BUILDNAME@@', 'iitc')
 
   def transform_builddate(self, contents):
     build_date = time.strftime('%Y-%m-%d-%H%M%S', self.utc_now)
