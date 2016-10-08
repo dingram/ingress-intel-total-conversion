@@ -3,6 +3,37 @@
  */
 namespace iitc.util {
 
+  export function convertTextToTableMagic(text: string): string {
+    // check if it should be converted to a table
+    if (!text.match(/\t/)) return text.replace(/\n/g, '<br>');
+
+    let data: string[][] = [];
+    let columnCount: number = 0;
+
+    // parse data
+    var rows = text.split('\n');
+    $.each(rows, function(i, row) {
+      data[i] = row.split('\t');
+      if(data[i].length > columnCount) columnCount = data[i].length;
+    });
+
+    // build the table
+    let table: string = '<table>';
+    $.each(data, function(i, row) {
+      table += '<tr>';
+      $.each(data[i], function(k, cell) {
+        let attributes: string = '';
+        if(k === 0 && data[i].length < columnCount) {
+          attributes = ' colspan="'+(columnCount - data[i].length + 1)+'"';
+        }
+        table += '<td'+attributes+'>'+cell+'</td>';
+      });
+      table += '</tr>';
+    });
+    table += '</table>';
+    return table;
+  }
+
   /**
    * Add thousand separators to a number.
    *
