@@ -137,6 +137,11 @@ function createDefaultBaseMapLayers() {
   baseLayers['CartoDB Dark Matter'] = L.tileLayer(cartoUrl,{attribution:cartoAttr,theme:'dark_all'});
   baseLayers['CartoDB Positron'] = L.tileLayer(cartoUrl,{attribution:cartoAttr,theme:'light_all'});
 
+  baseLayers['OSM'] =   L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+  });
+
+
 
   // we'll include google maps too - in the ingress default style, and a few other standard ones
   // as the stock intel map already uses the googme maps API, we just hijack their inclusion of the javascript and API key :)
@@ -151,6 +156,8 @@ function createDefaultBaseMapLayers() {
         { featureType:"transit", elementType:"all", stylers:[{visibility:"off"}] }
       ]
   };
+  
+
   baseLayers['Google Default Ingress Map'] = new L.Google('ROADMAP',{maxZoom:21, mapOptions:ingressGMapOptions});
   baseLayers['Google Roads'] = new L.Google('ROADMAP',{maxZoom:21});
   baseLayers['Google Satellite'] = new L.Google('SATELLITE',{maxZoom:21});
@@ -162,22 +169,11 @@ function createDefaultBaseMapLayers() {
 }
 
 
+
 window.setupMap = function() {
   $('#map').text('');
 
 
-
-
-  // proper initial position is now delayed until all plugins are loaded and the base layer is set
-  window.map = new L.Map('map', {
-    center: [0,0],
-    zoom: 1,
-    zoomControl: (typeof android !== 'undefined' && android && android.showZoom) ? android.showZoom() : true,
-    minZoom: MIN_ZOOM,
-//    zoomAnimation: false,
-    markerZoomAnimation: false,
-    bounceAtZoomLimits: false
-  });
 
   if (L.Path.CANVAS) {
     // for canvas, 2% overdraw only - to help performance
@@ -196,9 +192,27 @@ window.setupMap = function() {
   // TODO? move the actual IITC DOM into the leaflet control areas, so dummy <div>s aren't needed
   if(!isSmartphone()) {
     // chat window area
-    $(window.map._controlCorners['bottomleft']).append(
-      $('<div>').width(708).height(108).addClass('leaflet-control').css({'pointer-events': 'none', 'margin': '0'}));
+    //$(window.map._controlCorners['bottomleft']).append(
+      //$('<div>').width(708).height(108).addClass('leaflet-control').css({'pointer-events': 'none', 'margin': '0'}));
   }
+
+
+
+  var baseLayers = createDefaultBaseMapLayers();
+  var lc = L.control.layers(baseLayers)
+
+    // proper initial position is now delayed until all plugins are loaded and the base layer is set
+  window.map = new L.Map('map', {
+    center: [0,0],
+    zoom: 1,
+    zoomControl: (typeof android !== 'undefined' && android && android.showZoom) ? android.showZoom() : true,
+    minZoom: MIN_ZOOM,
+    markerZoomAnimation: false,
+    bounceAtZoomLimits: false
+  });
+
+  lc.addTo(window.map)
+
 
   var addLayers = {};
   var hiddenLayer = [];
@@ -208,7 +222,7 @@ window.setupMap = function() {
   for(var i = 0; i <= 8; i++) {
     portalsFactionLayers[i] = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
     portalsLayers[i] = L.layerGroup(portalsFactionLayers[i]);
-    map.addLayer(portalsLayers[i]);
+    portalsLayers[i].addTo(map);
     var t = (i === 0 ? 'Unclaimed/Placeholder' : 'Level ' + i) + ' Portals';
     addLayers[t] = portalsLayers[i];
     // Store it in hiddenLayer to remove later
@@ -217,14 +231,14 @@ window.setupMap = function() {
 
   fieldsFactionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
   var fieldsLayer = L.layerGroup(fieldsFactionLayers);
-  map.addLayer(fieldsLayer, true);
+  fieldsLayer.addTo(map);
   addLayers['Fields'] = fieldsLayer;
   // Store it in hiddenLayer to remove later
   if(!isLayerGroupDisplayed('Fields', true)) hiddenLayer.push(fieldsLayer);
 
   linksFactionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
   var linksLayer = L.layerGroup(linksFactionLayers);
-  map.addLayer(linksLayer, true);
+  linksLayer.addTo(map);
   addLayers['Links'] = linksLayer;
   // Store it in hiddenLayer to remove later
   if(!isLayerGroupDisplayed('Links', true)) hiddenLayer.push(linksLayer);
@@ -235,7 +249,7 @@ window.setupMap = function() {
   // the below 'onoverlayadd/onoverlayremove' events
   var factionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
   for (var fac in factionLayers) {
-    map.addLayer (factionLayers[fac]);
+    factionLayers[fac].addTo(map);
   }
 
   var setFactionLayersState = function(fac,enabled) {
@@ -281,13 +295,13 @@ window.setupMap = function() {
         break;
     }
   });
+  
 
-  var baseLayers = createDefaultBaseMapLayers();
 
-  window.layerChooser = new L.Control.Layers(baseLayers, addLayers);
+  window.layerChooser = L.control.layers(baseLayers._layers,addLayers);
 
   // Remove the hidden layer after layerChooser built, to avoid messing up ordering of layers 
-  $.each(hiddenLayer, function(ind, layer){
+  /*$.each(hiddenLayer, function(ind, layer){
     map.removeLayer(layer);
 
     // as users often become confused if they accidentally switch a standard layer off, display a warning in this case
@@ -303,9 +317,9 @@ window.setupMap = function() {
       $('#portaldetails').html('');
     });
 
-  });
+  });*/
 
-  map.addControl(window.layerChooser);
+  window.layerChooser.addTo(window.map);
 
   map.attributionControl.setPrefix('');
   // listen for changes and store them in cookies
@@ -367,12 +381,12 @@ window.setMapBaseLayer = function() {
     var obj = window.layerChooser._layers[i];
     if (!obj.overlay) {
       nameToLayer[obj.name] = obj.layer;
-      if (!firstLayer) firstLayer = obj.layer;
     }
+    if (!firstLayer) firstLayer = obj.layer;
   }
 
   var baseLayer = nameToLayer[localStorage['iitc-base-map']] || firstLayer;
-  map.addLayer(baseLayer);
+  baseLayer.addTo(map);
 
   // now we have a base layer we can set the map position
   // (setting an initial position, before a base layer is added, causes issues with leaflet)
@@ -686,12 +700,10 @@ function boot() {
           ref();
         } catch(err) {
           console.error("error starting plugin: index "+ind+", error: "+err);
-          debugger;
         }
       });
     }
   }
-
   window.setMapBaseLayer();
   window.setupLayerChooserApi();
 
